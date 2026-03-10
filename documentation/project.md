@@ -11,7 +11,7 @@
 
 ## 2. USP -- Alleinstellungsmerkmal
 
-OW-Vault ist keine rein statische Informationsseite. Es ist ein
+Athena-Log ist keine rein statische Informationsseite. Es ist ein
 **interaktives Strategie-Tool**, das exklusive Skin-Sammlungen mit einer
 **dynamischen Counter-Matrix** verbindet.
 
