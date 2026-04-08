@@ -1,5 +1,96 @@
+@font-face {
+    font-family: BigNoodleTooOblique;
+    src: url(./fonts/bignoodletoooblique.ttf);
+}
+
+@font-face {
+    font-family: BigNoodle;
+    src: url(./fonts/big_noodle_titling.ttf);
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+body {
+    background-color: black;
+}
+
+#background {
+    position: absolute;
+    background: url(./media/backgrounds/index/ow2.png);
+    background-position: center;
+    background-size: cover;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+:root {
+  --ow-blue: #00c3ff;
+  --ow-dark: #020611;
+}
+
+body {
+  background-color: black;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #020611;
+  height: 60px;
+  padding: 0 1%;
+  font-family: BigNoodleTooOblique;
+}
+.navLinks, .userNav {
+  flex: 1; 
+  display: flex;
+  align-items: center;
+}
+
+.userNav {
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.navLinks {
+  gap: 25px;
+}
+
+.navItem {
+  color: white;
+  text-decoration: none;
+  font-size: 1.8rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.playButton {
+  background: linear-gradient(180deg, #00d2ff 0%, #0080ff 100%);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 5%;
+  cursor: pointer;
+  clip-path: polygon(0% 0%, 100% 0%, 88% 100%, 12% 100%);
+  margin: 0 10px;
+}
+
+.playContent {
+  color: white;
+  font-family: BigNoodle;
+  font-size: 2.3rem;
+  text-transform: uppercase;
+}
+
+.userPfp {
+  width: 45px;
+  height: 45px;
+  border: 1px solid white;
+  border-radius: 50%;
 }
