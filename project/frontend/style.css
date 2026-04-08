@@ -126,19 +126,40 @@ body {
 
 .thisX {
     position: absolute;
-    width: 40%;
-    height: 25%;
-    background-color: #020611;
+    width: 60%; 
     bottom: 5%;
     left: 50%;
     transform: translateX(-50%);
-    z-index: -1;
     color: white;
+    text-align: center;
 }
 
 .thisX h1 {
     text-transform: uppercase;
     font-family: BigNoodleTooOblique;
-    font-size: 3rem;
-    text-align: center;
+    text-shadow: #020611 5px 5px 10px;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+
+}
+
+.thisXgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-right: 40px;
+    height: 180px;
+}
+
+.gridItem {
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(4px); 
+    display: flex;
+    align-items: flex-end;
+    padding-left: 5%;
+    font-style: italic;
+    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+    font-family: FuturaDemi, sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
 }
