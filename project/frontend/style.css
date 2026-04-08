@@ -8,6 +8,16 @@
     src: url(./fonts/big_noodle_titling.ttf);
 }
 
+@font-face {
+    font-family: FuturaDemi;
+    src: url(./fonts/futura-no2-d-demi-bold.ttf);
+}
+
+@font-face {
+    font-family: Pulse;
+    src: url(./fonts/PulseJP-Regular.ttf);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -29,15 +39,11 @@ body {
     opacity: 0.8;
 }
 
-:root {
-  --ow-blue: #00c3ff;
-  --ow-dark: #020611;
-}
-
 body {
   background-color: black;
 }
 
+/* NAVIGATION */
 .nav {
   display: flex;
   align-items: center;
@@ -93,4 +99,46 @@ body {
   height: 45px;
   border: 1px solid white;
   border-radius: 50%;
+}
+
+/* INDEX BOXES */
+.intro {
+    position: absolute;
+    width: 30%;
+    height: 60vh;
+    top: 10%;
+    left: 2.5%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    padding: 0.5% 1%;
+    color: white;
+}
+
+.intro h1 {
+    font-family: BigNoodleTooOblique;
+    font-size: 4rem;
+}
+
+.intro p {
+    font-family: Pulse;
+    font-size: 1.5rem;
+}
+
+.thisX {
+    position: absolute;
+    width: 40%;
+    height: 25%;
+    background-color: #020611;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -1;
+    color: white;
+}
+
+.thisX h1 {
+    text-transform: uppercase;
+    font-family: BigNoodleTooOblique;
+    font-size: 3rem;
+    text-align: center;
 }
