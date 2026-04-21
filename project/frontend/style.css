@@ -220,3 +220,134 @@ body {
     font-size: 1.5rem;
     text-transform: uppercase;
 }
+
+
+
+.accountContainer {
+    max-width: 80%;
+    margin: 5% auto;
+    padding: 2%;
+    color: white;
+    font-family: FuturaDemi;
+}
+
+.pageTitle {
+    font-family: BigNoodleTooOblique;
+    font-size: 3rem;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.settingsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 20px;
+}
+
+.settingsCard {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    padding: 25px;
+    border-left: 4px solid #0080ff;
+    border-radius: 4px;
+}
+
+.cardTitle {
+    font-family: BigNoodleTooOblique;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.userHeader {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.accountPfp {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background-color: #020611;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.heroUsername {
+    font-family: BigNoodleTooOblique;
+    font-size: 2.5rem;
+    color: white;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.inputGroup {
+    margin-bottom: 15px;
+}
+
+.inputGroup label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #ccc;
+    text-transform: uppercase;
+}
+
+.inputGroup input, 
+.inputGroup select, 
+.inputGroup textarea {
+    width: 100%;
+    padding: 3%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-family: FuturaDemi;
+    border-radius: 2px;
+}
+
+.readonlyInput {
+    background: rgba(0, 0, 0, 0.3);
+    color: #888;
+    cursor: not-allowed;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.editPfpButton {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    font-family: FuturaDemi;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.editPfpButton:hover {
+    background: white;
+    color: black;
+}
+
+.saveButton {
+    background: #0080ff;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-family: BigNoodleTooOblique;
+    font-size: 1.5rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 20px;
+    transition: transform 0.1s;
+}
+
+.saveButton:hover {
+    transform: scale(1.05);
+    background: #00d2ff;
+}
