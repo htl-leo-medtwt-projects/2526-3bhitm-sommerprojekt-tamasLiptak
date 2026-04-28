@@ -194,10 +194,9 @@ body {
 .thisX h1 {
     text-transform: uppercase;
     font-family: BigNoodleTooOblique;
-    text-shadow: #020611 5px 5px 10px;
+    text-shadow: black 5px 5px 10px;
     font-size: 2.5rem;
     margin-bottom: 15px;
-
 }
 
 .thisXgrid {
@@ -218,11 +217,12 @@ body {
     clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
     font-family: FuturaDemi, sans-serif;
     font-size: 1.5rem;
+    text-shadow: 0px 2px 5px black;
     text-transform: uppercase;
 }
 
 
-
+/*Account*/
 .accountContainer {
     max-width: 80%;
     margin: 5% auto;

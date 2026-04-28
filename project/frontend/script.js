@@ -1,8 +1,46 @@
+async function loadFavorites() {
+    try {
+        var [mapsRes, heroesRes] = await Promise.all([
+            fetch('https://overfast-api.tekrop.fr/maps'),
+            fetch('https://overfast-api.tekrop.fr/heroes')
+        ]);
+        // Maps
+        var maps = await mapsRes.json();
+        var heroesList = await heroesRes.json();
+
+        var randomMap = maps[Math.floor(Math.random() * maps.length)];
+        var gridItems = document.querySelectorAll('.gridItem');
+        gridItems[0].innerHTML = `<span>${randomMap.name}</span>`;
+        gridItems[0].style.backgroundImage = `url(${randomMap.screenshot})`;
+        gridItems[0].style.backgroundSize = 'cover';
+            gridItems[0].style.backgroundPosition = 'center';
+
+        // Heroes
+        var randomHeroSummary = heroesList[Math.floor(Math.random() * heroesList.length)];
+        
+        var heroDetailRes = await fetch(`https://overfast-api.tekrop.fr/heroes/${randomHeroSummary.key}`);
+        var heroDetail = await heroDetailRes.json();
+
+        if (heroDetail.backgrounds && heroDetail.backgrounds.length > 0) {
+            gridItems[1].innerHTML = `<span>${heroDetail.name}</span>`;
+            gridItems[1].style.backgroundImage = `url(${heroDetail.backgrounds[2].url})`;
+            gridItems[1].style.backgroundSize = 'cover';
+            gridItems[1].style.backgroundPosition = '90%';
+        }
+
+        // Skin
+        gridItems[2].innerHTML = `<span>Fav Skin</span>`;
+
+    } catch (error) {
+        console.error("Error fetching OverFast data:", error);
+    }
+}
+
 function loadLeaderboard() {
-    const container = document.getElementById('leaderboard-container');
+    var container = document.getElementById('leaderboardContainer');
     if (!container) return;
 
-    const mockPlayers = [
+    var mockPlayers = [
     { name: 'Viol2t',  mmr: 5000 },
     { name: 'Fleta',   mmr: 4978 },
     { name: 'Profit',  mmr: 4955 },
@@ -12,7 +50,7 @@ function loadLeaderboard() {
 
 container.innerHTML = '';
 mockPlayers.forEach(player => {
-    const item = document.createElement('div');
+    var item = document.createElement('div');
     item.className = 'playerItem';
     item.innerHTML = `
         <div class="pfpSquare">
@@ -27,4 +65,7 @@ mockPlayers.forEach(player => {
 });
 }
 
-document.addEventListener('DOMContentLoaded', loadLeaderboard);
+document.addEventListener('DOMContentLoaded', () => {
+    loadLeaderboard();
+    loadFavorites();
+});
