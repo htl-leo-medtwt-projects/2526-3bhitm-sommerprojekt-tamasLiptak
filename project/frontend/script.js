@@ -65,7 +65,45 @@ mockPlayers.forEach(player => {
 });
 }
 
+function handleLogin() {
+    var loginForm = document.getElementById('loginForm');
+    if (!loginForm) return;
+
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(loginForm);
+        
+        try {
+            var response = await fetch('login.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            var data = await response.json();
+            
+            if (data.status === 'success') {
+                document.getElementById('loginModal').style.display = 'none';
+                if (document.getElementById('accountContent')) {
+                    document.getElementById('accountContent').style.display = 'block';
+                }
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        } catch (err) {
+            console.error("Database connection failed", err);
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadLeaderboard();
+    loadFavorites();
+    handleLogin();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     loadLeaderboard();
     loadFavorites();
+    handleLogin();
 });
