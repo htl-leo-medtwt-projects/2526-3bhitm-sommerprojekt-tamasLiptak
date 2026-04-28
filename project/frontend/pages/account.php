@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -7,16 +9,16 @@ $db   = "athena_db";
 $conn = new mysqli($host, $user, $pass, $db);
 
 $authMessage = "";
-$loggedIn = false;
-$userData = null;
+$loggedIn = isset($_SESSION['loggedIn']) ? $_SESSION['loggedIn'] : false;
+$userData = isset($_SESSION['userData']) ? $_SESSION['userData'] : null;
 $authMode = isset($_POST['authMode']) ? $_POST['authMode'] : 'login';
 
+// Authentication
 if (isset($_POST['authSubmit'])) {
     $u = $_POST['username'];
     $p = $_POST['password'];
 
     if ($_POST['authMode'] === 'register') {
-        // Register
         $check = $conn->prepare("SELECT * FROM users WHERE username = ?");
         $check->bind_param("s", $u);
         $check->execute();
@@ -30,7 +32,6 @@ if (isset($_POST['authSubmit'])) {
             $authMode = 'login';
         }
     } else {
-        // Login
         $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
         $stmt->bind_param("ss", $u, $p);
         $stmt->execute();
@@ -39,8 +40,49 @@ if (isset($_POST['authSubmit'])) {
         if ($result->num_rows > 0) {
             $loggedIn = true;
             $userData = $result->fetch_assoc();
+            $_SESSION['loggedIn'] = true;
+            $_SESSION['userData'] = $userData;
         } else {
             $authMessage = '<p style="color: #ff4444; margin-top: 10px; font-family: FuturaDemi;">Access Denied: Invalid Credentials</p>';
+        }
+    }
+}
+
+// File upload
+if (isset($_POST['uploadSubmit']) && $loggedIn) {
+    $targetDir = "./../media/profilepictures/uploads/";
+
+    if (!file_exists($targetDir)) {
+        mkdir($targetDir, 0777, true);
+    }
+
+    $fileName = basename($_FILES["fileToUpload"]["name"]);
+    $targetFile = $targetDir . $fileName;
+    $uploadOk = true;
+    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+    if ($check === false) {
+        $authMessage = "File is not an image.";
+        $uploadOk = false;
+    }
+
+    if ($uploadOk) {
+        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
+            try {
+                $stmt = $conn->prepare("UPDATE users SET profilepicture = ? WHERE userID = ?");
+                $stmt->bind_param("si", $targetFile, $_SESSION['userData']['userID']);
+
+                if ($stmt->execute()) {
+                    $_SESSION['userData']['profilepicture'] = $targetFile;
+                    $userData['profilepicture'] = $targetFile;
+                    $authMessage = '<p style="color: #00ff00;">Avatar saved to database!</p>';
+                }
+            } catch (mysqli_sql_exception $e) {
+                $authMessage = '<p style="color: #ff4444;">DB Error: ' . $e->getMessage() . '</p>';
+            }
+        } else {
+            $authMessage = '<p style="color: #ff4444;">Permission Error: Could not move file to uploads folder.</p>';
         }
     }
 }
@@ -109,21 +151,31 @@ if (isset($_POST['authSubmit'])) {
             '</div>' .
             '</div>';
     }
-    ?>
 
-    <?php
     if ($loggedIn) {
+        $currentPfp = !empty($userData['profilepicture']) ? $userData['profilepicture'] : './../media/profilepictures/default/default.png';
+
         echo
-        '<div class="accountContainer">' .
+        '<div class="accountContainer" id="accountContainer">' .
             '<header><h1 class="pageTitle">Account Settings</h1></header>' .
             '<div class="settingsGrid">' .
             '<div class="settingsCard">' .
             '<h2 class="cardTitle">Profile Information</h2>' .
             '<div class="userHeader">' .
-            '<div class="accountPfp"></div>' .
+            '<div class="accountPfp" style="background-image: url(\'' . $currentPfp . '\'); background-size: cover; background-position: center;"></div>' .
             '<div>' .
             '<h2 class="heroUsername">' . strtoupper($userData['username']) . '</h2>' .
-            '<button class="editPfpButton">Change Avatar</button>' .
+            
+            '<form action="account.php" method="POST" enctype="multipart/form-data" style="margin-top: 10px;">' .
+            '<label class="editPfpButton" style="display: inline-block; cursor: pointer;">' .
+            'Change Avatar' .
+            '<input type="file" name="fileToUpload" id="fileToUpload" accept="image/*" required style="display: none;" onchange="document.getElementById(\'uploadConfirmBtn\').style.display=\'inline-block\'">' .
+            '</label>' .
+            '<button type="submit" name="uploadSubmit" id="uploadConfirmBtn" class="editPfpButton" style="display:none; border-color: #00d2ff; color: #00d2ff; margin-left: 10px;">' .
+            'Confirm Upload' .
+            '</button>' .
+            '</form>' .
+            
             '</div>' .
             '</div>' .
             '<div class="inputGroup">' .
@@ -132,7 +184,7 @@ if (isset($_POST['authSubmit'])) {
             '</div>' .
             '<div class="inputGroup">' .
             '<label>Email Address</label>' .
-            '<input type="email" value="user@gmail.com" readonly class="readonlyInput">' .
+            '<input type="email" value="' . ($userData['email'] ?? 'Not set') . '" readonly class="readonlyInput">' .
             '</div>' .
             '<div class="inputGroup">' .
             '<label for="profileBio">Notes</label>' .
@@ -143,11 +195,11 @@ if (isset($_POST['authSubmit'])) {
             '<h2 class="cardTitle">Preferences</h2>' .
             '<div class="inputGroup">' .
             '<label for="favoriteRole">Favorite Role</label>' .
-            '<select id="favoriteRole">' .
-            '<option value="tank">Tank</option>' .
-            '<option value="damage">Damage</option>' .
-            '<option value="support">Support</option>' .
-            '</select>' .
+            '<select id="favoriteRole"><option value="tank">Tank</option><option value="damage">Damage</option><option value="support">Support</option></select>' .
+            '</div>' .
+            '<div class="inputGroup">' .
+            '<label for="regionSelect">Region</label>' .
+            '<select id="regionSelect"><option value="eu">Europe</option><option value="us">Americas</option><option value="as">Asia</option></select>' .
             '</div>' .
             '</div>' .
             '</div>' .
