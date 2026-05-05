@@ -79,3 +79,13 @@ async function loadHeroDetails(heroKey) {
 }
 
 fetchHeroes();
+
+var currentPath = window.location.pathname;
+
+var navLinks = document.querySelectorAll('.navItem');
+
+navLinks.forEach(link => {
+    if (currentPath.includes(link.getAttribute('href').replace('./', ''))) {
+        link.classList.add('active');
+    }
+});

@@ -32,7 +32,7 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
     <nav class="nav">
         <div class="navLinks">
             <a href="./heroes.php" class="navItem">HEROES</a>
-            <a href="./maps.php" class="navItem" style="color: #00d2ff;">MAPS</a>
+            <a href="./maps.php" class="navItem">MAPS</a>
             <a href="./counters.php" class="navItem">COUNTERS</a>
         </div>
         <div class="playButton">
