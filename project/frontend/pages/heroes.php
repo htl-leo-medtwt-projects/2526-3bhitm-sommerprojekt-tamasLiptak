@@ -46,8 +46,8 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
         </div>
     </nav>
 
-    <main class="heroesContainer">
-        <section class="heroSidebar">
+    <div class="heroesContainer">
+        <div class="heroSidebar">
             <div class="heroGridScroll" id="heroListContainer">
             </div>
 
@@ -56,9 +56,9 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
                 <div class="abilityGrid" id="abilityContainer">
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="heroDisplay">
+        <div class="heroDisplay">
             <img src="" id="heroBigImage" alt="">
 
             <div class="heroInfoCard">
@@ -72,8 +72,8 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
                 </div><br>
                 <span style="font-family: Pulse; font-size: 0.8rem; color: #00d2ff;">← Top 3 Maps</span>
             </div>
-        </section>
-    </main>
+        </div>
+    </div>
 </body>
 
 </html>
