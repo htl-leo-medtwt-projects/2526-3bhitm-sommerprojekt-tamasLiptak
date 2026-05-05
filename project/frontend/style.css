@@ -385,3 +385,141 @@ body {
 .cardTitle {
     font-size: 2.5rem;
 }
+        .heroesContainer {
+            display: flex;
+            padding: 20px;
+            height: 98vh;
+            position: relative;
+        }
+
+        .heroSidebar {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+            padding: 2% 0 2% 0;
+        }
+
+        .heroGridScroll {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 3px solid #00d2ff;
+        }
+
+        .roleSection h3 {
+            color: #00d2ff;
+            font-family: FuturaDemi;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .portraitGrid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .heroPortrait {
+            aspect-ratio: 1/1;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            background-size: cover;
+            transition: transform 0.2s;
+        }
+
+        .heroPortrait:hover {
+            transform: scale(1.1);
+            border-color: #00d2ff;
+        }
+
+        .abilitySection {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            color: #00d2ff;
+            padding: 15px;
+            height: 150px;
+            border-right: 3px solid #00d2ff;
+        }
+
+        .abilityGrid {
+            display: flex;
+            height: max-content;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .abilityBox {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #0080ff;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .heroDisplay {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 40px;
+        }
+
+        #heroBigImage {
+            position: absolute;
+            top: 0;
+            right: -500px;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .heroInfoCard {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            text-align: right;
+            border-right: 5px solid #00d2ff;
+            max-width: 500px;
+        }
+
+        .heroNameLarge {
+            font-family: BigNoodleTooOblique;
+            font-size: 5rem;
+            color: white;
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        .heroDesc {
+            font-family: Pulse;
+            color: #ccc;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .mapSuggestions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .mapBox {
+            width: 120px;
+            height: 70px;
+            background: #00d2ff;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+        }
+        
+        .emptyBox {
+            width: 120px;
+            height: 70px;
+        }

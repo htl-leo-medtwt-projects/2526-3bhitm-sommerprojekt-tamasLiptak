@@ -13,11 +13,11 @@ async function loadFavorites() {
         gridItems[0].innerHTML = `<span>${randomMap.name}</span>`;
         gridItems[0].style.backgroundImage = `url(${randomMap.screenshot})`;
         gridItems[0].style.backgroundSize = 'cover';
-            gridItems[0].style.backgroundPosition = 'center';
+        gridItems[0].style.backgroundPosition = 'center';
 
         // Heroes
         var randomHeroSummary = heroesList[Math.floor(Math.random() * heroesList.length)];
-        
+
         var heroDetailRes = await fetch(`https://overfast-api.tekrop.fr/heroes/${randomHeroSummary.key}`);
         var heroDetail = await heroDetailRes.json();
 
@@ -41,18 +41,18 @@ function loadLeaderboard() {
     if (!container) return;
 
     var mockPlayers = [
-    { name: 'Viol2t',  mmr: 5000 },
-    { name: 'Fleta',   mmr: 4978 },
-    { name: 'Profit',  mmr: 4955 },
-    { name: 'Striker', mmr: 4932 },
-    { name: 'Proper',  mmr: 4910 },
-];
+        { name: 'Viol2t', mmr: 5000 },
+        { name: 'Fleta', mmr: 4978 },
+        { name: 'Profit', mmr: 4955 },
+        { name: 'Striker', mmr: 4932 },
+        { name: 'Proper', mmr: 4910 },
+    ];
 
-container.innerHTML = '';
-mockPlayers.forEach(player => {
-    var item = document.createElement('div');
-    item.className = 'playerItem';
-    item.innerHTML = `
+    container.innerHTML = '';
+    mockPlayers.forEach(player => {
+        var item = document.createElement('div');
+        item.className = 'playerItem';
+        item.innerHTML = `
         <div class="pfpSquare">
             <img src="https://ui-avatars.com/api/?name=${player.name}&background=0D1B2A&color=00d2ff&size=55&bold=true&format=png"
                  alt="${player.name}"
@@ -61,27 +61,27 @@ mockPlayers.forEach(player => {
         <span class="playerName">${player.name}</span>
         <span class="playerMmr">${player.mmr}</span>
     `;
-    container.appendChild(item);
-});
+        container.appendChild(item);
+    });
 }
 
 function handleLogin() {
     var loginForm = document.getElementById('loginForm');
     if (!loginForm) return;
 
-    loginForm.addEventListener('submit', async function(e) {
+    loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         var formData = new FormData(loginForm);
-        
+
         try {
             var response = await fetch('login.php', {
                 method: 'POST',
                 body: formData
             });
-            
+
             var data = await response.json();
-            
+
             if (data.status === 'success') {
                 document.getElementById('loginModal').style.display = 'none';
                 if (document.getElementById('accountContent')) {
@@ -95,12 +95,6 @@ function handleLogin() {
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    loadLeaderboard();
-    loadFavorites();
-    handleLogin();
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     loadLeaderboard();

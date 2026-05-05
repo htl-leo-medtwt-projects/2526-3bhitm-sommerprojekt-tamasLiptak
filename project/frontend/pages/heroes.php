@@ -18,15 +18,18 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Athena-Log | Heroes</title>
     <link rel="stylesheet" href="./../style.css">
+    <script src="./heroes_script.js" defer></script>
 </head>
+
 <body>
 
-        <nav class="nav">
+    <nav class="nav">
         <div class="navLinks">
             <a href="./heroes.php" class="navItem">HEROES</a>
             <a href="./maps.php" class="navItem">MAPS</a>
@@ -38,13 +41,39 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
             </div>
         </div>
         <div class="userNav">
-            <a href="#" class="navItem"><?php echo $loggedIn ? $userData['username'] : 'Guest'; ?></a>
-            <div class="userPfp" style="
-            background-image: url('<?php echo $navPfp ?>');
-            background-size: cover; 
-            background-position: center;"></div>
+            <a href="./account.php" class="navItem"><?php echo htmlspecialchars($navUsername); ?></a>
+            <div class="userPfp" style="background-image: url('<?php echo $navPfp ?>'); background-size: cover;"></div>
         </div>
     </nav>
-    
+
+    <main class="heroesContainer">
+        <section class="heroSidebar">
+            <div class="heroGridScroll" id="heroListContainer">
+            </div>
+
+            <div class="abilitySection">
+                <h3 style="font-size: 1rem;">Abilities</h3>
+                <div class="abilityGrid" id="abilityContainer">
+                </div>
+            </div>
+        </section>
+
+        <section class="heroDisplay">
+            <img src="" id="heroBigImage" alt="">
+
+            <div class="heroInfoCard">
+                <h1 id="selectedHeroName" class="heroNameLarge">Select Hero</h1>
+                <p id="selectedHeroDesc" class="heroDesc">Click a hero portrait to view details.</p>
+
+                <div class="mapSuggestions">
+                    <div class="mapBox"></div>
+                    <div class="mapBox"></div>
+                    <div class="mapBox"></div>
+                </div><br>
+                <span style="font-family: Pulse; font-size: 0.8rem; color: #00d2ff;">← Top 3 Maps</span>
+            </div>
+        </section>
+    </main>
 </body>
+
 </html>
