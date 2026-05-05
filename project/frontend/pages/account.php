@@ -12,6 +12,8 @@ $authMessage = "";
 $loggedIn = isset($_SESSION['loggedIn']) ? $_SESSION['loggedIn'] : false;
 $userData = isset($_SESSION['userData']) ? $_SESSION['userData'] : null;
 $authMode = isset($_POST['authMode']) ? $_POST['authMode'] : 'login';
+$defaultPfp = './../media/profilepictures/default/default.png';
+$navPfp = ($loggedIn && !empty($userData['profilepicture'])) ? $userData['profilepicture'] : $defaultPfp;
 
 // Authentication
 if (isset($_POST['authSubmit'])) {
@@ -109,12 +111,15 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
         </div>
         <div class="playButton">
             <div class="playContent">
-                <a href="./../index.html">Athena Log</a>
+                <a href="./../index.php">Athena Log</a>
             </div>
         </div>
         <div class="userNav">
             <a href="#" class="navItem"><?php echo $loggedIn ? $userData['username'] : 'Guest'; ?></a>
-            <div class="userPfp"></div>
+            <div class="userPfp" style="
+            background-image: url('<?php echo $navPfp ?>');
+            background-size: cover; 
+            background-position: center;"></div>
         </div>
     </nav>
 
@@ -165,7 +170,7 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
             '<div class="accountPfp" style="background-image: url(\'' . $currentPfp . '\'); background-size: cover; background-position: center;"></div>' .
             '<div>' .
             '<h2 class="heroUsername">' . strtoupper($userData['username']) . '</h2>' .
-            
+
             '<form action="account.php" method="POST" enctype="multipart/form-data" style="margin-top: 10px;">' .
             '<label class="editPfpButton" style="display: inline-block; cursor: pointer;">' .
             'Change Avatar' .
@@ -175,7 +180,7 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
             'Confirm Upload' .
             '</button>' .
             '</form>' .
-            
+
             '</div>' .
             '</div>' .
             '<div class="inputGroup">' .
