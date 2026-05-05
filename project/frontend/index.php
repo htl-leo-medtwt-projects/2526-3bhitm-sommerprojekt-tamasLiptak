@@ -34,9 +34,9 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
 
     <nav class="nav">
         <div class="navLinks">
-            <a href="#" class="navItem">HEROES</a>
-            <a href="#" class="navItem">MAPS</a>
-            <a href="#" class="navItem">COUNTERS</a>
+            <a href="./pages/heroes.php" class="navItem">HEROES</a>
+            <a href="./pages/maps.php" class="navItem">MAPS</a>
+            <a href="./pages/counters.php" class="navItem">COUNTERS</a>
         </div>
 
         <div class="playButton">

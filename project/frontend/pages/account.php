@@ -105,9 +105,9 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
 
     <nav class="nav">
         <div class="navLinks">
-            <a href="#" class="navItem">HEROES</a>
-            <a href="#" class="navItem">MAPS</a>
-            <a href="#" class="navItem">COUNTERS</a>
+            <a href="./heroes.php" class="navItem">HEROES</a>
+            <a href="./maps.php" class="navItem">MAPS</a>
+            <a href="./counters.php" class="navItem">COUNTERS</a>
         </div>
         <div class="playButton">
             <div class="playContent">
