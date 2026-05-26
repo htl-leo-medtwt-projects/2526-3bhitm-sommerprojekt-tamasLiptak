@@ -88,6 +88,30 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
         }
     }
 }
+
+// Update Preferences
+if (isset($_POST['savePreferencesSubmit']) && $loggedIn) {
+    $btag = trim($_POST['battletagInput']);
+    $userId = $_SESSION['userData']['userID'];
+
+    // Validation
+    if (!empty($btag) && (!preg_match('/^[^#]{3,12}#[0-9]{1,5}$/', $btag) || strlen($btag) > 18)) {
+        $btagErrorMessage = '<p style="color: #ff4444; font-size: 14px; margin-top: 5px; font-family: FuturaDemi;">Invalid Tag. Name must be 3-12 chars, followed by # and up to 5 digits (Max 18 total).</p>';
+    } else {
+        try {
+            $stmt = $conn->prepare("UPDATE users SET battletag = ? WHERE userID = ?");
+            $stmt->bind_param("si", $btag, $userId);
+
+            if ($stmt->execute()) {
+                $_SESSION['userData']['battletag'] = $btag;
+                $userData['battletag'] = $btag;
+                $authMessage = '<p style="color: #00ff00;">Preferences updated successfully!</p>';
+            }
+        } catch (mysqli_sql_exception $e) {
+            $authMessage = '<p style="color: #ff4444;">DB Error: ' . $e->getMessage() . '</p>';
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -159,10 +183,16 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
 
     if ($loggedIn) {
         $currentPfp = !empty($userData['profilepicture']) ? $userData['profilepicture'] : './../media/profilepictures/default/default.png';
+        $currentBtag = $userData['battletag'] ?? '';
+
+        $btagErrorHTML = $btagErrorMessage ?? '';
 
         echo
         '<div class="accountContainer" id="accountContainer">' .
             '<header><h1 class="pageTitle">Account Settings</h1></header>' .
+
+            '<form action="account.php" method="POST">' .
+
             '<div class="settingsGrid">' .
             '<div class="settingsCard">' .
             '<h2 class="cardTitle">Profile Information</h2>' .
@@ -170,17 +200,6 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
             '<div class="accountPfp" style="background-image: url(\'' . $currentPfp . '\'); background-size: cover; background-position: center;"></div>' .
             '<div>' .
             '<h2 class="heroUsername">' . strtoupper($userData['username']) . '</h2>' .
-
-            '<form action="account.php" method="POST" enctype="multipart/form-data" style="margin-top: 10px;">' .
-            '<label class="editPfpButton" style="display: inline-block; cursor: pointer;">' .
-            'Change Avatar' .
-            '<input type="file" name="fileToUpload" id="fileToUpload" accept="image/*" required style="display: none;" onchange="document.getElementById(\'uploadConfirmBtn\').style.display=\'inline-block\'">' .
-            '</label>' .
-            '<button type="submit" name="uploadSubmit" id="uploadConfirmBtn" class="editPfpButton" style="display:none; border-color: #00d2ff; color: #00d2ff; margin-left: 10px;">' .
-            'Confirm Upload' .
-            '</button>' .
-            '</form>' .
-
             '</div>' .
             '</div>' .
             '<div class="inputGroup">' .
@@ -196,6 +215,7 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
             '<textarea id="profileBio" rows="3" placeholder="Put your notes here..."></textarea>' .
             '</div>' .
             '</div>' .
+
             '<div class="settingsCard">' .
             '<h2 class="cardTitle">Preferences</h2>' .
             '<div class="inputGroup">' .
@@ -206,9 +226,18 @@ if (isset($_POST['uploadSubmit']) && $loggedIn) {
             '<label for="regionSelect">Region</label>' .
             '<select id="regionSelect"><option value="eu">Europe</option><option value="us">Americas</option><option value="as">Asia</option></select>' .
             '</div>' .
+            '<div class="inputGroup">' .
+            '<label>Battle.net Tag</label>' .
+            '<input type="text" placeholder="Battletag#1234" id="battletagInput" name="battletagInput" maxlength="18" value="' . htmlspecialchars($currentBtag) . '">' .
+            $btagErrorHTML .
+            '</div>' .
+            $authMessage .
             '</div>' .
             '</div>' .
-            '<footer><button class="saveButton">Save Changes</button></footer>' .
+
+            '<footer><button type="submit" name="savePreferencesSubmit" class="saveButton">Save Changes</button></footer>' .
+
+            '</form>' .
             '</div>';
     }
     ?>

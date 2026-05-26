@@ -57,7 +57,7 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
     </nav>
 
     <div class="intro">
-        <h1>Welcome guest!</h1><br>
+        <h1>Welcome <?php echo htmlspecialchars($navUsername); ?>!</h1><br>
         <p>Athena-Log is your ultimate interactive companion for mastering
             Overwatch, designed to feel like a natural extension of the game
             itself. <br><br> It moves beyond static wikis by offering a
