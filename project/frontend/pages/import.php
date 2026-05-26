@@ -21,7 +21,7 @@ if ($response === FALSE) {
 
 $maps = json_decode($response, true);
 
-$stmt = $conn->prepare("INSERT IGNORE INTO maps (name, location, gamemode) VALUES (?, ?, ?)");
+$stmt = $conn->prepare("INSERT IGNORE INTO maps (name, location, gamemode, screenshot) VALUES (?, ?, ?, ?)");
 if ($stmt === FALSE) {
     die("Error at Prepared Statement: " . $conn->error);
 }
@@ -32,8 +32,10 @@ foreach ($maps as $map) {
     $name = $map['name'];
     $location = $map['location'] ?? ''; 
     $gamemode = isset($map['gamemodes']) ? implode(', ', $map['gamemodes']) : '';
+    
+    $screenshot = $map['screenshot'] ?? '';
 
-    $stmt->bind_param("sss", $name, $location, $gamemode);
+    $stmt->bind_param("ssss", $name, $location, $gamemode, $screenshot);
     
     if ($stmt->execute()) {
         if ($conn->affected_rows > 0) {

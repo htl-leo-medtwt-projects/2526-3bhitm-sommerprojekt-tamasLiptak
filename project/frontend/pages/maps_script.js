@@ -3,13 +3,13 @@ let selectedGamemode = null;
 
 async function fetchMaps() {
     try {
-        const response = await fetch('https://overfast-api.tekrop.fr/maps');
+        const response = await fetch('./get_maps.php');
         allMaps = await response.json();
         const gamemodes = [...new Set(allMaps.flatMap(m => m.gamemodes))].sort();
         renderGamemodeList(gamemodes);
         selectGamemode(gamemodes[0]);
     } catch (error) {
-        console.error('Failed to load maps:', error);
+        console.error('Failed to load maps from database:', error);
     }
 }
 
