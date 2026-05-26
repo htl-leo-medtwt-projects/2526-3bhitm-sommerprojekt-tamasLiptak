@@ -112,6 +112,26 @@ if (isset($_POST['savePreferencesSubmit']) && $loggedIn) {
         }
     }
 }
+
+// Logout
+if (isset($_POST['logoutSubmit'])) {
+    $_SESSION = array();
+    if (ini_get("session_use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $params["path"],
+            $params["domain"],
+            $params["secure"],
+            $params["httponly"]
+        );
+    }
+    session_destroy();
+    header("Location: account.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -235,7 +255,10 @@ if (isset($_POST['savePreferencesSubmit']) && $loggedIn) {
             '</div>' .
             '</div>' .
 
-            '<footer><button type="submit" name="savePreferencesSubmit" class="saveButton">Save Changes</button></footer>' .
+            '<footer style="display: flex; gap: 15px; align-items: center;">' .
+            '<button type="submit" name="savePreferencesSubmit" class="saveButton">Save Changes</button>' .
+            '<button type="submit" name="logoutSubmit" class="logoutButton">LOG OUT</button>' .
+            '</footer>' .
 
             '</form>' .
             '</div>';
