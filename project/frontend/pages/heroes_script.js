@@ -1,16 +1,22 @@
+let allHeroes = [];
+
 async function fetchHeroes() {
     try {
-        const response = await fetch('https://overfast-api.tekrop.fr/heroes');
-        const heroes = await response.json();
-        renderHeroList(heroes);
+        const response = await fetch('./get_heroes.php');
+        allHeroes = await response.json();
+        
+        renderHeroList(allHeroes);
+        
+        if (allHeroes.length > 0) {
+            loadHeroDetails(allHeroes[0].heroID);
+        }
     } catch (error) {
-        console.error("Failed to load heroes:", error);
+        console.error("Failed to load heroes from database:", error);
     }
 }
 
 function renderHeroList(heroes) {
-    console.log('Heroes received:', heroes);
-    console.log('Is array:', Array.isArray(heroes));
+    console.log('Heroes received from DB:', heroes);
     const container = document.getElementById('heroListContainer');
     if (!container) return;
 
@@ -18,13 +24,11 @@ function renderHeroList(heroes) {
     container.innerHTML = '';
 
     roles.forEach(role => {
-        const roleHeroes = heroes.filter(h => h.role === role);
-        console.log(role, roleHeroes.length);
+        const roleHeroes = heroes.filter(h => h.role.toLowerCase() === role);
+        
         const roleWrapper = document.createElement('div');
         roleWrapper.className = 'roleSection';
-        roleWrapper.innerHTML = `<h3>${role}</h3>`;
-
-
+        roleWrapper.innerHTML = `<h3>${role.toUpperCase()}</h3>`;
 
         const grid = document.createElement('div');
         grid.className = 'portraitGrid';
@@ -33,38 +37,33 @@ function renderHeroList(heroes) {
             const div = document.createElement('div');
             div.className = 'heroPortrait';
             div.style.backgroundImage = `url(${hero.portrait})`;
-            div.onclick = () => loadHeroDetails(hero.key);
+            div.title = hero.name;
+            
+            div.onclick = () => loadHeroDetails(hero.heroID);
             grid.appendChild(div);
         });
-
-
 
         roleWrapper.appendChild(grid);
         container.appendChild(roleWrapper);
     });
 }
 
-async function loadHeroDetails(heroKey) {
-    try {
-        const response = await fetch(`https://overfast-api.tekrop.fr/heroes/${heroKey}`);
-        const hero = await response.json();
+function loadHeroDetails(heroID) {
+    const hero = allHeroes.find(h => h.heroID === heroID);
+    if (!hero) return;
 
-        document.getElementById('selectedHeroName').innerText = hero.name;
-        document.getElementById('selectedHeroDesc').innerText = hero.description;
+    document.getElementById('selectedHeroName').innerText = hero.name;
+    document.getElementById('selectedHeroDesc').innerText = hero.description || '';
 
-        const bigImg = document.getElementById('heroBigImage');
+    const bigImg = document.getElementById('heroBigImage');
+    if (bigImg) {
+        bigImg.src = hero.screenshot ? hero.screenshot : hero.portrait;
+    }
 
-        if (hero.backgrounds && hero.backgrounds.length > 0) {
-            const preferred = hero.backgrounds.find(b => b.sizes.includes('xl+'))
-                || hero.backgrounds.find(b => b.sizes.includes('lg'))
-                || hero.backgrounds[0];
-            bigImg.src = preferred.url;
-        } else {
-            bigImg.src = hero.portrait;
-        }
-        const abilityContainer = document.getElementById('abilityContainer');
-        abilityContainer.innerHTML = '';
+    const abilityContainer = document.getElementById('abilityContainer');
+    abilityContainer.innerHTML = '';
 
+    if (hero.abilities && hero.abilities.length > 0) {
         hero.abilities.forEach(ability => {
             const abBox = document.createElement('div');
             abBox.className = 'abilityBox';
@@ -72,16 +71,12 @@ async function loadHeroDetails(heroKey) {
             abBox.title = ability.name;
             abilityContainer.appendChild(abBox);
         });
-
-    } catch (error) {
-        console.error("Error fetching hero details:", error);
     }
 }
 
 fetchHeroes();
 
 var currentPath = window.location.pathname;
-
 var navLinks = document.querySelectorAll('.navItem');
 
 navLinks.forEach(link => {
