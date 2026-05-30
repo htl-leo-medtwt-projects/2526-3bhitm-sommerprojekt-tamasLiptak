@@ -89,7 +89,7 @@ body {
 .navItem.active::after {
     content: '';
     position: absolute;
-    bottom: -5px; 
+    bottom: -5px;
     left: 0;
     width: 100%;
     height: 4px;
@@ -386,7 +386,8 @@ body {
 }
 
 
-.saveButton:hover, .logoutButton:hover {
+.saveButton:hover,
+.logoutButton:hover {
     transform: scale(1.05);
     background: #00d2ff;
 }
@@ -585,6 +586,7 @@ body {
     height: 100%;
     overflow: hidden;
 }
+
 .gamemodeList {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
@@ -626,8 +628,8 @@ body {
     overflow-y: auto;
     border-right: 3px solid #00d2ff;
     display: grid;
-    grid-template-columns: repeat(2, 1fr); 
-    grid-auto-rows: min-content; 
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: min-content;
     gap: 15px;
     align-content: start;
 }
@@ -644,8 +646,9 @@ body {
     overflow: hidden;
     transition: transform 0.2s, border-color 0.2s;
 
-    display: block; 
+    display: block;
 }
+
 .mapThumb:hover {
     transform: scale(1.03);
     border-color: #00d2ff;
@@ -715,4 +718,539 @@ body {
     color: #ccc;
     font-size: 0.9rem;
     margin-top: 4px;
+}
+
+/*COUNTERS PAGE*/
+
+.countersWrapper {
+    display: flex;
+    gap: 0;
+    height: 95vh;
+    /* below nav */
+    overflow: hidden;
+}
+
+/*LEFT - Heroes*/
+.heroRosterPanel {
+    width: 220px;
+    min-width: 220px;
+    background: rgba(10, 12, 18, 0.97);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rosterHeader {
+    padding: 18px 14px 10px;
+    font-family: FuturaDemi;
+    font-size: 1em;
+    color: white;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.rosterSearchWrap {
+    padding: 10px 12px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rosterSearch {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.rosterSearch:focus {
+    border-color: rgba(255, 130, 30, 0.6);
+}
+
+.rosterSearch::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+#heroRoster {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+#heroRoster::-webkit-scrollbar {
+    width: 4px;
+}
+
+#heroRoster::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.rosterSection {
+    margin-bottom: 4px;
+}
+
+.rosterRoleLabel {
+    font-family: FuturaDemi;
+    font-size: 1em;
+    color: white;
+    padding: 10px 14px 4px;
+}
+
+.rosterGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    padding: 0 8px;
+}
+
+.rosterHero {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center top;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    filter: grayscale(30%) brightness(0.85);
+    border: 2px solid transparent;
+}
+
+.rosterHero:hover {
+    filter: grayscale(0%) brightness(1.1);
+    transform: scale(1.08);
+    z-index: 2;
+    position: relative;
+}
+
+.rosterHeroActive {
+    filter: grayscale(0%) brightness(1.15);
+    border-color: #ff821e;
+    box-shadow: 0 0 10px rgba(255, 130, 30, 0.5);
+}
+
+/*MIDDLE: detailed*/
+.counterDetailPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    font-family: Pulse;
+}
+
+/*Hero banner*/
+.counterHeroBanner {
+    position: relative;
+    height: 160px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.counterPanelBg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center 20%;
+    transition: background-image 0.4s;
+}
+
+.counterPanelBgOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right,
+            rgba(0, 0, 0, 0.7) 0%,
+            rgba(0, 0, 0, 0.2) 60%,
+            transparent 100%);
+}
+
+.counterHeroInfo {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 20px;
+}
+
+.selectedHeroAvatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center top;
+    border: 2px solid #00d2ff;
+    box-shadow: 0 0 20px rgba(255, 130, 30, 0.25);
+    flex-shrink: 0;
+}
+
+.selectedHeroMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.selectedHeroLabel {
+    font-family: Pulse;
+    font-size: 1em;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+}
+
+#selectedHeroName {
+    font-family: BigNoodleTooOblique;
+    font-size: 2.5em;
+    letter-spacing: 0.02em;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+#selectedHeroRole {
+    font-family: Pulse;
+    font-size: 1em;
+    color: #00d2ff;
+    margin-top: 2px;
+}
+
+.countersPanelTitle {
+    font-size: 1em;
+    color: white;
+    text-transform: uppercase;
+    padding: 14px 24px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    background: rgba(8, 10, 16, 0.98);
+}
+
+/*Counter cards list*/
+#counterList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px 24px;
+    background: rgba(8, 10, 16, 0.97);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+#counterList::-webkit-scrollbar {
+    width: 4px;
+}
+
+#counterList::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+}
+
+.counterLoading {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    padding: 32px 0;
+    text-align: center;
+    letter-spacing: 0.05em;
+}
+
+/*Counter cards list*/
+.counterCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    animation: cardIn 0.25s ease both;
+    transition: border-color 0.2s;
+}
+
+.counterCard:hover {
+    border-color: rgba(0, 210, 255, 0.7);
+}
+
+.counterCard.counterCardOpen {
+    border-color: rgba(0, 210, 255, 0.5);
+}
+
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.counterCardHeader {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.counterCardHeader:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.counterPortrait {
+    width: 46px;
+    height: 46px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center top;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.counterPortrait:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+}
+
+.counterMeta {
+    flex: 1;
+}
+
+.counterHeroName {
+    font-family: BigNoodleTooOblique;
+    font-size: 1.5em;
+    color: white;
+}
+
+.counterRole {
+    font-size: 0.8em;
+    color: rgba(0, 210, 255, 1);
+    margin-top: 2px;
+}
+
+/*severity*/
+.severityBadge {
+    font-size: 0.8em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.sevSoft {
+    background: rgba(80, 180, 120, 0.18);
+    color: #5cb87a;
+    border: 1px solid rgba(80, 180, 120, 0.3);
+}
+
+.sevHard {
+    background: rgba(230, 150, 30, 0.18);
+    color: #e69620;
+    border: 1px solid rgba(230, 150, 30, 0.3);
+}
+
+.sevExtreme {
+    background: rgba(220, 50, 50, 0.18);
+    color: #dc3a3a;
+    border: 1px solid rgba(220, 50, 50, 0.3);
+}
+
+.counterChevron {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.3);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+/*Counter card body*/
+.counterCardBody {
+    display: none;
+    padding: 0 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    animation: bodyIn 0.2s ease both;
+}
+
+.counterCardOpen .counterCardBody {
+    display: block;
+}
+
+@keyframes bodyIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.counterSection {
+    margin-top: 12px;
+}
+
+.counterSectionTitle {
+    font-size: 1em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(0, 210, 255, 1);
+    margin-bottom: 6px;
+}
+
+.counterSectionText {
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/*Comp blocks*/
+.counterComps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.compBlock {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 5px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.compBlock.compGood {
+    border-color: rgba(80, 180, 120, 0.15);
+}
+
+.compBlock.compDanger {
+    border-color: rgba(220, 50, 50, 0.15);
+}
+
+.compTitle {
+    font-size: 0.8em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.compGood .compTitle {
+    color: rgba(92, 184, 122, 1);
+}
+
+.compDanger .compTitle {
+    color: rgba(220, 80, 80, 1);
+}
+
+.compList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.compTag {
+    font-size: 11px;
+    color: white;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    line-height: 1.4;
+}
+
+.compTag:last-child {
+    border-bottom: none;
+}
+
+.noData {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.25);
+    font-style: italic;
+}
+
+/*RIGHT: quick-tip sidebar*/
+.counterSidebar {
+    width: 260px;
+    min-width: 260px;
+    background: rgba(10, 12, 18, 0.97);
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: Pulse;
+}
+
+.sidebarHeader {
+    padding: 18px 18px 12px;
+    font-family: FuturaDemi;
+    font-size: 1em;
+    color: white;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.sidebarBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.sidebarBody::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebarBody::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+}
+
+.sidebarTip {
+    background: rgba(0, 210, 255, 0.06);
+    border: 1px solid rgba(0, 210, 255, 0.15);
+    border-radius: 5px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+
+.sidebarTipTitle {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    color: #00d2ff;
+    margin-bottom: 6px;
+}
+
+.sidebarTipText {
+    font-size: 0.8em;
+    color: white;
+    line-height: 1.65;
+}
+
+/*Empty*/
+#emptyState {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 48px 32px;
+    color: rgba(255, 255, 255, 0.25);background-color: #020611;
+    text-align: center;
+}
+
+.emptyIcon {
+    font-size: 36px;
+    opacity: 0.4;
+}
+
+.emptyText {
+    font-size: 13px;
+    letter-spacing: 0.04em;
 }
