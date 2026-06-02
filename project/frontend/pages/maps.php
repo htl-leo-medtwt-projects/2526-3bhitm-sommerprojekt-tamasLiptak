@@ -42,7 +42,11 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
         </div>
         <div class="userNav">
             <a href="./account.php" class="navItem"><?php echo htmlspecialchars($navUsername); ?></a>
-            <div class="userPfp" style="background-image: url('<?php echo $navPfp ?>'); background-size: cover;"></div>
+            <div class="userPfp" style="
+                background-image: url('<?php echo htmlspecialchars($navPfp, 3); ?>');
+                background-size: cover;
+                background-position: center;">
+            </div>
         </div>
     </nav>
 

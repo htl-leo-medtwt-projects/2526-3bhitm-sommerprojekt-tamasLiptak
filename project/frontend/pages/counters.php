@@ -47,7 +47,7 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
                 <?php echo htmlspecialchars($navUsername); ?>
             </a>
             <div class="userPfp" style="
-                background-image: url('<?php echo htmlspecialchars(substr($navPfp, 3)); ?>');
+                background-image: url('<?php echo htmlspecialchars($navPfp, 3); ?>');
                 background-size: cover;
                 background-position: center;">
             </div>
@@ -65,8 +65,7 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
                     id="heroSearch"
                     class="rosterSearch"
                     placeholder="Search hero…"
-                    autocomplete="off"
-                >
+                    autocomplete="off">
             </div>
             <div id="heroRoster"></div>
         </div>
@@ -144,4 +143,5 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
 
 
 </body>
+
 </html>
