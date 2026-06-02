@@ -246,8 +246,17 @@ body {
     text-transform: uppercase;
 }
 
+.bg-account {
+    position: fixed;
+    inset: 0;
+    background-image: url(./../media/backgrounds/account/ow1.jpg);
+    background-position: center;
+    background-size: cover;
+    z-index: -1;
+    opacity: 0.8;
+}
 
-/* account.php */
+/* Page container */
 .accountContainer {
     max-width: 80%;
     margin: 5% auto;
@@ -266,7 +275,6 @@ body {
 .settingsGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
     gap: 20px;
 }
 
@@ -303,12 +311,47 @@ body {
     flex-shrink: 0;
 }
 
+.userHeaderInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .heroUsername {
     font-family: BigNoodleTooOblique;
     font-size: 2.5rem;
     color: white;
     text-transform: uppercase;
     margin: 0;
+    line-height: 1;
+}
+
+/* Avatar upload form */
+.avatarForm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.avatarInput {
+    display: none;
+}
+
+.avatarLabel {
+    display: inline-block;
+    cursor: pointer;
+    margin-top: 0;
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    border: 2px solid white;
+}
+
+.uploadBtn {
+    display: none;
+    margin-top: 0;
+    padding: 8px 20px;
+    font-size: 1.1rem;
 }
 
 .inputGroup {
@@ -317,10 +360,12 @@ body {
 
 .inputGroup label {
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     margin-bottom: 5px;
     color: #ccc;
     text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: FuturaDemi;
 }
 
 .inputGroup input,
@@ -335,29 +380,18 @@ body {
     border-radius: 2px;
 }
 
-.readonlyInput {
-    background: rgba(0, 0, 0, 0.3);
-    color: #888;
-    cursor: not-allowed;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.editPfpButton {
-    background: transparent;
-    border: 1px solid white;
+.inputGroup select option {
+    background: #020611;
     color: white;
-    padding: 5px 10px;
-    font-size: 0.7rem;
-    font-family: FuturaDemi;
-    text-transform: uppercase;
-    cursor: pointer;
-    margin-top: 5px;
 }
 
-.editPfpButton:hover {
-    background: white;
-    color: black;
+.readonlyInput {
+    background: rgba(0, 0, 0, 0.3) !important;
+    color: #666 !important;
+    cursor: not-allowed;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
+
 
 .saveButton {
     background: #0080ff;
@@ -369,11 +403,24 @@ body {
     cursor: pointer;
     text-transform: uppercase;
     margin-top: 20px;
-    transition: transform 0.1s;
+    transition: background 0.2s ease, transform 0.1s ease;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.saveButton--full {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+.saveButton:hover {
+    background: #00d2ff;
+    transform: scale(1.03);
 }
 
 .logoutButton {
-    background: #ff0000;
+    background: #cc0000;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -382,32 +429,36 @@ body {
     cursor: pointer;
     text-transform: uppercase;
     margin-top: 20px;
-    transition: transform 0.1s;
-}
-
-
-.saveButton:hover,
-.logoutButton:hover {
-    transform: scale(1.05);
-    background: #00d2ff;
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .logoutButton:hover {
-    transform: scale(1.05);
     background: #ff433d;
+    transform: scale(1.03);
 }
 
+.settingsFooter {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 5px;
+}
 
-.modal-overlay {
+.authMsg {
+    font-family: FuturaDemi;
+    font-size: 0.8rem;
+    margin-top: 10px;
+}
+.authMsg--success { color: #00ff88; }
+.authMsg--error   { color: #ff4444; }
+.authMsg--warn    { color: #ffcc00; }
+
+.modalOverlay {
     position: fixed;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .loginCard {
@@ -416,15 +467,41 @@ body {
     backdrop-filter: blur(4px);
     padding: 2%;
     border-left: 4px solid #00d2ff;
-    width: 40vh;
+    width: 360px;
     color: white;
     left: 50%;
     top: 50%;
     transform: translateY(-50%) translateX(-50%);
 }
 
-.cardTitle {
+.loginCard .cardTitle {
     font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.loginCard h3 {
+    font-family: Pulse;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+.toggleForm {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.toggleBtn {
+    background: none;
+    border: none;
+    color: #00d2ff;
+    cursor: pointer;
+    font-family: FuturaDemi;
+    font-size: 0.8rem;
+    text-decoration: underline;
+}
+
+.toggleBtn:hover {
+    color: white;
 }
 
 /* heroes.php*/

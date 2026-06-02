@@ -107,14 +107,14 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
             <div class="sidebarBody">
 
                 <div class="sidebarTip">
-                    <div class="sidebarTipTitle">🎯 Portrait Shortcut</div>
+                    <div class="sidebarTipTitle">Portrait Shortcut</div>
                     <div class="sidebarTipText">
                         Click any counter's portrait to instantly jump to <em>their</em> counter matchups — chain through counters to find the perfect pick.
                     </div>
                 </div>
 
                 <div class="sidebarTip">
-                    <div class="sidebarTipTitle">🔴 Severity Guide</div>
+                    <div class="sidebarTipTitle">Severity Guide</div>
                     <div class="sidebarTipText">
                         <strong style="color:#5cb87a;">Soft Counter</strong> — slight disadvantage, skill can overcome it.<br><br>
                         <strong style="color:#e69620;">Hard Counter</strong> — serious threat, swap if possible.<br><br>
@@ -123,14 +123,14 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
                 </div>
 
                 <div class="sidebarTip">
-                    <div class="sidebarTipTitle">🤝 Team Comps</div>
+                    <div class="sidebarTipTitle">Team Comps</div>
                     <div class="sidebarTipText">
                         Each card shows friendly comps that synergise with your hero and dangerous enemy compositions to watch for.
                     </div>
                 </div>
 
                 <div class="sidebarTip">
-                    <div class="sidebarTipTitle">💡 Tip</div>
+                    <div class="sidebarTipTitle">Tip</div>
                     <div class="sidebarTipText">
                         Counter data is community-curated. If you spot an error or want to add a matchup, ask an admin to update it via the database.
                     </div>
