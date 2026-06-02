@@ -817,7 +817,9 @@ body {
     aspect-ratio: 1;
     border-radius: 4px;
     background-size: cover;
-    background-position: center top;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: hidden;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
     filter: grayscale(30%) brightness(0.85);
