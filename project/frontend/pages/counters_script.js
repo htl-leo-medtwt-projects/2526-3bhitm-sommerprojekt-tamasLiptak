@@ -91,6 +91,9 @@ function filterRoster(query) {
 
 // Hero select
 function selectHero(heroID) {
+    // Force heroID to be an integer to eliminate string vs. number type mismatches
+    heroID = parseInt(heroID);
+
     if (currentHeroID === heroID) return;
     currentHeroID = heroID;
 
@@ -99,7 +102,8 @@ function selectHero(heroID) {
         el.classList.toggle('rosterHeroActive', parseInt(el.dataset.heroId) === heroID);
     });
 
-    const hero = allHeroes.find(h => h.heroID === heroID);
+    // Parse the array item ID as an integer to guarantee a clean type match
+    const hero = allHeroes.find(h => parseInt(h.heroID) === heroID);
     if (!hero) return;
 
     // Update the selected hero header

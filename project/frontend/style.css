@@ -771,7 +771,7 @@ body {
 }
 
 .rosterSearch:focus {
-    border-color: rgba(255, 130, 30, 0.6);
+    border-color: rgba(0, 210, 255, 0.6);
 }
 
 .rosterSearch::placeholder {
@@ -833,7 +833,7 @@ body {
 
 .rosterHeroActive {
     filter: grayscale(0%) brightness(1.15);
-    border-color: #ff821e;
+    border-color: #00d2ff;
     box-shadow: 0 0 10px rgba(255, 130, 30, 0.5);
 }
 
