@@ -247,37 +247,204 @@ async function loadLeaderboard() {
     }
 }
 
-// ─── Favourites ─────────────────────────────────────────────────────────────
+// ─── This Week's Favourites — Voting ────────────────────────────────────────
 
-async function loadFavorites() {
+const VOTE_API = './pages/vote.php';
+const HEROES_API = './pages/get_heroes.php';
+const MAPS_API = './pages/get_maps.php';
+const VOTES_API = './pages/get_votes.php';
+
+let allHeroes = [];
+let allMaps = [];
+let userVotes = { hero: null, map: null };
+let isLoggedIn = false;
+let overlayTimeout = null;
+
+async function initFavourites() {
+    const [heroesRes, mapsRes, votesRes] = await Promise.all([
+        fetch(HEROES_API),
+        fetch(MAPS_API),
+        fetch(VOTES_API),
+    ]);
+
+    allHeroes = await heroesRes.json();
+    allMaps = await mapsRes.json();
+    const votes = await votesRes.json();
+
+    userVotes = votes.user_votes || { hero: null, map: null };
+    isLoggedIn = votes.logged_in || false;
+
+    // Render winners first, then attach hover — order matters
+    renderTopItem('map', votes.top_map);
+    renderTopItem('hero', votes.top_hero);
+    attachHoverListeners();
+}
+
+// ── Render the winning item into the grid box ────────────────────────────────
+function renderTopItem(type, data) {
+    const index = type === 'map' ? 0 : 1;
+    const box = document.querySelectorAll('.gridItem')[index];
+    if (!box) return;
+
+    if (data) {
+        box.style.backgroundImage = `url(${data.screenshot})`;
+        box.style.backgroundSize = 'cover';
+        box.style.backgroundPosition = type === 'hero' ? '80% center' : 'center';
+        box.innerHTML = `
+            <div class="gridItem-label">
+                <span class="gridItem-name">${data.name}</span>
+                <span class="gridItem-votes">${data.votes} vote${data.votes == 1 ? '' : 's'}</span>
+            </div>`;
+    } else {
+        box.style.backgroundImage = '';
+        box.innerHTML = `<span class="gridItem-name">${type === 'map' ? 'Map' : 'Hero'}</span>`;
+    }
+    box.dataset.voteType = type;
+}
+
+// ── Hover listeners on Map + Hero boxes ─────────────────────────────────────
+function attachHoverListeners() {
+    const gridItems = document.querySelectorAll('.gridItem');
+    const mapBox = gridItems[0];
+    const heroBox = gridItems[1];
+
+    if (mapBox) setupHover(mapBox, 'map');
+    if (heroBox) setupHover(heroBox, 'hero');
+}
+
+function setupHover(box, type) {
+    box.addEventListener('mouseenter', () => {
+        clearTimeout(overlayTimeout);
+        showOverlay(box, type);
+    });
+    box.addEventListener('mouseleave', (e) => {
+        const overlay = document.getElementById('vote-overlay');
+        if (overlay && overlay.contains(e.relatedTarget)) return;
+        overlayTimeout = setTimeout(() => closeOverlay(), 150);
+    });
+}
+
+// ── Build & show the overlay grid ───────────────────────────────────────────
+function showOverlay(anchor, type) {
+    closeOverlay(true);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'vote-overlay';
+    overlay.className = 'vote-overlay';
+
+    overlay.addEventListener('mouseenter', () => clearTimeout(overlayTimeout));
+    overlay.addEventListener('mouseleave', () => {
+        overlayTimeout = setTimeout(() => closeOverlay(), 150);
+    });
+
+    if (!isLoggedIn) {
+        overlay.innerHTML = `<p class="vote-login-notice">Log in to vote for this week's favourites.</p>`;
+    } else if (type === 'hero') {
+        overlay.appendChild(buildHeroGrid());
+    } else {
+        overlay.appendChild(buildMapGrid());
+    }
+
+    document.body.appendChild(overlay);
+
+    // Position above the anchor box
+    const rect = anchor.getBoundingClientRect();
+    overlay.style.position = 'fixed';
+    overlay.style.left = `${Math.max(0, rect.right - 520)}px`;
+    overlay.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+
+    requestAnimationFrame(() => overlay.classList.add('vote-overlay--visible'));
+}
+
+function closeOverlay(immediate = false) {
+    const overlay = document.getElementById('vote-overlay');
+    if (!overlay) return;
+    if (immediate) {
+        overlay.remove();
+        return;
+    }
+    overlay.classList.remove('vote-overlay--visible');
+    overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+}
+
+// ── Hero grid grouped by role ────────────────────────────────────────────────
+function buildHeroGrid() {
+    const roles = ['tank', 'damage', 'support']; const frag = document.createDocumentFragment();
+
+    roles.forEach(role => {
+        const group = allHeroes.filter(h => h.role === role);
+        if (!group.length) return;
+
+        const section = document.createElement('div');
+        section.className = 'vote-role-section';
+        section.innerHTML = `<h4 class="vote-role-title">${role.charAt(0).toUpperCase() + role.slice(1)}</h4>`;
+        const grid = document.createElement('div');
+        grid.className = 'vote-grid';
+
+        group.forEach(hero => {
+            const card = document.createElement('div');
+            card.className = 'vote-card' + (userVotes.hero === hero.name ? ' vote-card--active' : '');
+            card.innerHTML = `
+                <img src="${hero.portrait}" alt="${hero.name}" class="vote-card-img">
+                <span class="vote-card-name">${hero.name}</span>`;
+            card.addEventListener('click', () => castVote('hero', hero.name, card));
+            grid.appendChild(card);
+        });
+
+        section.appendChild(grid);
+        frag.appendChild(section);
+    });
+
+    return frag;
+}
+
+// ── Map grid ─────────────────────────────────────────────────────────────────
+function buildMapGrid() {
+    const frag = document.createDocumentFragment();
+    const grid = document.createElement('div');
+    grid.className = 'vote-grid';
+
+    allMaps.forEach(map => {
+        const card = document.createElement('div');
+        card.className = 'vote-card vote-card--map' + (userVotes.map === map.name ? ' vote-card--active' : '');
+        card.innerHTML = `
+            <img src="${map.screenshot}" alt="${map.name}" class="vote-card-img vote-card-img--map">
+            <span class="vote-card-name">${map.name}</span>`;
+        card.addEventListener('click', () => castVote('map', map.name, card));
+        grid.appendChild(card);
+    });
+
+    frag.appendChild(grid);
+    return frag;
+}
+
+// ── Cast a vote ──────────────────────────────────────────────────────────────
+async function castVote(type, value, clickedCard) {
+    const overlay = document.getElementById('vote-overlay');
+    if (overlay) {
+        overlay.querySelectorAll('.vote-card').forEach(c => c.classList.remove('vote-card--active'));
+    }
+    clickedCard.classList.add('vote-card--active');
+    userVotes[type] = value;
+
     try {
-        var [mapsRes, heroesRes] = await Promise.all([
-            fetch('https://overfast-api.tekrop.fr/maps'),
-            fetch('https://overfast-api.tekrop.fr/heroes')
-        ]);
-        var maps = await mapsRes.json();
-        var heroesList = await heroesRes.json();
-        var randomMap = maps[Math.floor(Math.random() * maps.length)];
-        var gridItems = document.querySelectorAll('.gridItem');
-        gridItems[0].innerHTML = `<span>${randomMap.name}</span>`;
-        gridItems[0].style.backgroundImage = `url(${randomMap.screenshot})`;
-        gridItems[0].style.backgroundSize = 'cover';
-        gridItems[0].style.backgroundPosition = 'center';
+        const body = new URLSearchParams({ type, value });
+        const res = await fetch(VOTE_API, { method: 'POST', body });
+        const data = await res.json();
 
-        var randomHeroSummary = heroesList[Math.floor(Math.random() * heroesList.length)];
-        var heroDetailRes = await fetch(`https://overfast-api.tekrop.fr/heroes/${randomHeroSummary.key}`);
-        var heroDetail = await heroDetailRes.json();
-        if (heroDetail.backgrounds && heroDetail.backgrounds.length > 0) {
-            gridItems[1].innerHTML = `<span>${heroDetail.name}</span>`;
-            gridItems[1].style.backgroundImage = `url(${heroDetail.backgrounds[2].url})`;
-            gridItems[1].style.backgroundSize = 'cover';
-            gridItems[1].style.backgroundPosition = '90%';
+        if (data.success) {
+            const votesRes = await fetch(VOTES_API);
+            const votesData = await votesRes.json();
+            renderTopItem('map', votesData.top_map);
+            renderTopItem('hero', votesData.top_hero);
         }
-        gridItems[2].innerHTML = `<span>Fav Skin</span>`;
-    } catch (error) {
-        console.error('Error fetching OverFast data:', error);
+    } catch (err) {
+        console.error('Vote failed:', err);
     }
 }
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', initFavourites);
 
 // ─── Login handler ──────────────────────────────────────────────────────────
 
@@ -308,7 +475,6 @@ function handleLogin() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadLeaderboard();
-    loadFavorites();
     handleLogin();
 });
 

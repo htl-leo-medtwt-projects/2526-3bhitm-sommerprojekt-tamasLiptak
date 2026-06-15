@@ -468,12 +468,11 @@ body {
     display: flex;
     align-items: flex-end;
     padding-left: 5%;
-    font-style: italic;
     clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
-    font-family: FuturaDemi, sans-serif;
-    font-size: 1.5rem;
-    text-shadow: 0px 2px 5px black;
-    text-transform: uppercase;
+    font-family: BigNoodleTooOblique;
+    font-size: 2rem;
+    text-shadow: 0px 2px 6px black;
+    line-height: 1;
 }
 
 .bg-account {
@@ -484,6 +483,173 @@ body {
     background-size: cover;
     z-index: -1;
     opacity: 0.8;
+}
+
+/* ─── This Week's Favourites — Vote Overlay ──────────────────────────────── */
+
+.gridItem {
+    position: relative;
+    cursor: pointer;
+    background-position: right center;
+}
+
+.gridItem-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 5%;
+    padding-bottom: 8px;
+}
+
+.gridItem-name {
+    font-family: BigNoodleTooOblique;
+    font-size: 2rem;
+    text-shadow: 0px 2px 6px black;
+    line-height: 1;
+    text-align: left;
+}
+
+.gridItem-votes {
+    font-family: FuturaDemi;
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: rgba(0, 210, 255, 1);
+    text-shadow: 0px 1px 4px black;
+    text-align: left;
+}
+
+/* ── Overlay container ────────────────────────────────────────────────────── */
+
+.vote-overlay {
+    position: absolute;
+    z-index: 99999;
+    width: 520px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: rgba(2, 6, 17, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    padding: 16px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 210, 255, 0.3) transparent;
+}
+
+.vote-overlay--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.vote-overlay::-webkit-scrollbar {
+    width: 4px;
+}
+
+.vote-overlay::-webkit-scrollbar-thumb {
+    background: rgba(0, 210, 255, 0.3);
+    border-radius: 2px;
+}
+
+/* ── Role section ─────────────────────────────────────────────────────────── */
+
+.vote-role-section {
+    margin-bottom: 16px;
+}
+
+.vote-role-section:last-child {
+    margin-bottom: 0;
+}
+
+.vote-role-title {
+    font-family: BigNoodleTooOblique;
+    font-size: 1.3rem;
+    color: rgba(0, 210, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(0, 210, 255, 0.12);
+}
+
+/* ── Vote card grid ───────────────────────────────────────────────────────── */
+
+.vote-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 8px;
+}
+
+.vote-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px 4px;
+    border: 1px solid transparent;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.vote-card:hover {
+    background: rgba(0, 210, 255, 0.07);
+    border-color: rgba(0, 210, 255, 0.25);
+}
+
+.vote-card--active {
+    border-color: #00d2ff;
+    background: rgba(0, 210, 255, 0.12);
+    box-shadow: 0 0 8px rgba(0, 210, 255, 0.2);
+}
+
+/* ── Hero portrait card ───────────────────────────────────────────────────── */
+
+.vote-card-img {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+}
+
+/* ── Map card (wider image) ───────────────────────────────────────────────── */
+
+.vote-card--map {
+    grid-column: span 1;
+}
+
+.vote-card-img--map {
+    width: 100%;
+    height: 48px;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* ── Card label ───────────────────────────────────────────────────────────── */
+
+.vote-card-name {
+    font-family: FuturaDemi;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.vote-card--active .vote-card-name {
+    color: #00d2ff;
+}
+
+/* ── Not logged in notice ─────────────────────────────────────────────────── */
+
+.vote-login-notice {
+    font-family: Pulse;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    padding: 16px 0;
 }
 
 /* Page container */
