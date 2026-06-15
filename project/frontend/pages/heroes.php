@@ -27,7 +27,7 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
     <script src="./heroes_script.js" defer></script>
 </head>
 
-<body>
+<body style="overflow: hidden;">
 
     <nav class="nav">
         <div class="navLinks">

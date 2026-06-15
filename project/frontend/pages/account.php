@@ -198,8 +198,6 @@ if (isset($_POST['logoutSubmit'])) {
                 <h1 class="pageTitle">Account Settings</h1>
             </header>
 
-            <div class="settingsGrid">
-
                 <div class="settingsCard">
                     <h2 class="cardTitle">Profile Information</h2>
 
@@ -216,38 +214,10 @@ if (isset($_POST['logoutSubmit'])) {
                         </div>
                     </div>
 
-                    <div class="inputGroup">
-                        <label>Username</label>
-                        <input type="text" value="<?php echo htmlspecialchars($userData['username']); ?>" readonly class="readonlyInput">
-                    </div>
-                    <div class="inputGroup">
-                        <label>Email Address</label>
-                        <input type="email" value="<?php echo htmlspecialchars($userData['email'] ?? 'Not set'); ?>" readonly class="readonlyInput">
-                    </div>
-                    <div class="inputGroup">
-                        <label for="profileBio">Notes</label>
-                        <textarea id="profileBio" rows="3" placeholder="Put your notes here..."></textarea>
-                    </div>
-                </div>
-
-                <div class="settingsCard">
-                    <h2 class="cardTitle">Preferences</h2>
                     <form action="account.php" method="POST">
                         <div class="inputGroup">
-                            <label for="favoriteRole">Favorite Role</label>
-                            <select id="favoriteRole">
-                                <option value="tank">Tank</option>
-                                <option value="damage">Damage</option>
-                                <option value="support">Support</option>
-                            </select>
-                        </div>
-                        <div class="inputGroup">
-                            <label for="regionSelect">Region</label>
-                            <select id="regionSelect">
-                                <option value="eu">Europe</option>
-                                <option value="us">Americas</option>
-                                <option value="as">Asia</option>
-                            </select>
+                            <label>Username</label>
+                            <input type="text" value="<?php echo htmlspecialchars($userData['username']); ?>" readonly class="readonlyInput">
                         </div>
                         <div class="inputGroup">
                             <label>Battle.net Tag</label>
@@ -257,14 +227,21 @@ if (isset($_POST['logoutSubmit'])) {
                             <?php echo $btagErrorMessage; ?>
                         </div>
                         <?php if (!isset($_POST['uploadSubmit'])) echo $authMessage; ?>
-
+                        
+                        <div class="settingsButtonsGroup">
+                            <footer class="settingsFooter">
+                                <button type="submit" name="savePreferencesSubmit" class="saveButton">Save Changes</button>
+                            </footer>
+                            <form action="account.php" method="POST">
+                                <button type="submit" name="logoutSubmit" class="logoutButton">Log Out</button>
+                            </form>
+                        </div>
                     </form>
+                    
                 </div>
-                <footer class="settingsFooter">
-                    <button type="submit" name="savePreferencesSubmit" class="saveButton">Save Changes</button>
-                    <button type="submit" name="logoutSubmit" class="logoutButton">Log Out</button>
-                </footer>
-            </div>
+            
+
+            
         </div>
 
     <?php endif; ?>

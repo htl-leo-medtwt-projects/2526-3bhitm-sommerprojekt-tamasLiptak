@@ -51,7 +51,8 @@ body {
 /* NAVIGATION */
 .nav {
     display: flex;
-    position: relative;
+    position: sticky;
+    top: 0;
     align-items: center;
     justify-content: space-between;
     background-color: #020611;
@@ -857,7 +858,7 @@ body {
 
 /* Page container */
 .accountContainer {
-    max-width: 80%;
+    max-width: 38%;
     margin: 5% auto;
     padding: 2%;
     color: white;
@@ -869,12 +870,6 @@ body {
     font-size: 3rem;
     text-transform: uppercase;
     margin-bottom: 20px;
-}
-
-.settingsGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
 }
 
 .settingsCard {
@@ -995,6 +990,7 @@ body {
 .saveButton {
     background: #0080ff;
     color: white;
+    width: 180px;
     border: none;
     padding: 15px 40px;
     font-family: BigNoodleTooOblique;
@@ -1007,12 +1003,6 @@ body {
     text-decoration: none;
 }
 
-.saveButton--full {
-    width: 100%;
-    display: block;
-    text-align: center;
-}
-
 .saveButton:hover {
     background: #00d2ff;
     transform: scale(1.03);
@@ -1020,6 +1010,7 @@ body {
 
 .logoutButton {
     background: #cc0000;
+    width: 180px;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -1115,13 +1106,13 @@ body {
 /* heroes.php*/
 .heroesContainer {
     display: flex;
-    padding: 20px;
-    height: 98vh;
+    height: 95vh;
     position: relative;
 }
 
 .heroSidebar {
     width: 30%;
+    margin-left: 2%;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -1423,7 +1414,6 @@ body {
     display: flex;
     gap: 0;
     height: 95vh;
-    /* below nav */
     overflow: hidden;
 }
 
