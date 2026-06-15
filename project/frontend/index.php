@@ -88,9 +88,9 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
     <div class="thisX">
         <h1>This Week's Favourites</h1>
         <div class="thisXgrid">
-            <div class="gridItem">Fav Map</div>
-            <div class="gridItem">Fav Hero</div>
-            <div class="gridItem">Fav Skin</div>
+            <div class="gridItem">Map</div>
+            <div class="gridItem">Hero</div>
+            <div class="gridItem">Skin</div>
         </div>
     </div>
 </body>
