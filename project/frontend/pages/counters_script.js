@@ -190,7 +190,6 @@ function renderCounters(counters) {
             </div>
         `;
 
-        // Toggle on header click
         const header = card.querySelector('.counterCardHeader');
         const body = card.querySelector('.counterCardBody');
         const chevron = card.querySelector('.counterChevron');
@@ -199,7 +198,7 @@ function renderCounters(counters) {
             chevron.textContent = isOpen ? '▾' : '▸';
         });
 
-        // Clicking the portrait jumps to that counter hero's counters
+        // Clicking the portrait jumps to that counter heros counters
         const portrait = card.querySelector('.counterPortrait');
         portrait.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -218,9 +217,9 @@ function renderComps(comps) {
 
 init();
 
-// ── Notes ──────────────────────────────────────────────────────────────
+// Notes 
 
-let noteModalMode = null; // 'public' | 'private'
+let noteModalMode = null;
 
 document.getElementById('addPublicNoteBtn')?.addEventListener('click', () => openNoteModal('public'));
 document.getElementById('addPrivateNoteBtn')?.addEventListener('click', () => openNoteModal('private'));
@@ -238,7 +237,6 @@ function openNoteModal(mode) {
     const title = document.getElementById('noteModalTitle');
     if (title) title.textContent = mode === 'public' ? 'Submit Public Tip' : 'Add Private Note';
 
-    // Reset fields
     ['noteCounterTips', 'noteTeammateHelp', 'noteGoodComp1', 'noteGoodComp2', 'noteDangerComp1', 'noteDangerComp2']
         .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
 
@@ -277,7 +275,6 @@ function populateNoteHeroPicker(defaultHeroID) {
     });
 }
 
-// Severity toggle
 document.querySelectorAll('.noteSevBtn').forEach(btn => {
     btn.addEventListener('click', () => {
         selectedSeverity = parseInt(btn.dataset.sev);

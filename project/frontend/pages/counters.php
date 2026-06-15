@@ -123,7 +123,7 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
 
         </div>
 
-        <!-- Modal: Add Note -->
+        <!-- Add Note -->
         <div id="noteModal" class="noteModalOverlay" style="display:none;">
             <div class="noteModalBox">
                 <div class="noteModalTitle" id="noteModalTitle">Add Note</div>
