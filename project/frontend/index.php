@@ -62,9 +62,8 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
             Overwatch, designed to feel like a natural extension of the game
             itself. <br><br> It moves beyond static wikis by offering a
             personalized
-            tactical dashboard where you can manage your mains, track your
-            personal skin collection, and save custom strategy notes
-            directly to your profile.
+            tactical dashboard, weekly votes, Battle.Net Tag implementation and saving custom strategy notes
+            directly to your profile or even making them public.
         </p>
         <p></p>
     </div>

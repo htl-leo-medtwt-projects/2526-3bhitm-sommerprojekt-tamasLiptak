@@ -119,15 +119,15 @@ function createTooltip(player) {
                 <span class="tip-stat-value" style="color:#4dd9ac;">${winRate}</span>
             </div>
             <div class="tip-stat">
-                <span class="tip-stat-label">Best Streak</span>
+                <span class="tip-stat-label">Best Kill Streak</span>
                 <span class="tip-stat-value" style="color:#ffd700;">${bestKS}</span>
             </div>
             <div class="tip-stat">
-                <span class="tip-stat-label">Dmg Done</span>
+                <span class="tip-stat-label">Dmg Done All Time</span>
                 <span class="tip-stat-value">${dmg}</span>
             </div>
             <div class="tip-stat">
-                <span class="tip-stat-label">Healing Done</span>
+                <span class="tip-stat-label">Healing Done All Time</span>
                 <span class="tip-stat-value" style="color:#ff6eb4;">${healing}</span>
             </div>
         </div>
@@ -355,7 +355,7 @@ function showOverlay(anchor, type) {
 
     const rect = anchor.getBoundingClientRect();
     overlay.style.position = 'fixed';
-    overlay.style.left = `${Math.max(0, rect.right - 520)}px`;
+    overlay.style.left = `${Math.max(0, rect.right - 450)}px`;
     overlay.style.bottom = `${window.innerHeight - rect.top + 10}px`;
 
     requestAnimationFrame(() => overlay.classList.add('vote-overlay--visible'));
