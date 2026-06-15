@@ -118,6 +118,7 @@ function selectHero(heroID) {
     if (bgEl) bgEl.style.backgroundImage = `url(${hero.screenshot || hero.portrait})`;
 
     fetchCounters(heroID);
+    fetchMyNotes(heroID);
 }
 
 // Counter data
@@ -216,3 +217,238 @@ function renderComps(comps) {
 }
 
 init();
+
+// ── Notes ──────────────────────────────────────────────────────────────
+
+let noteModalMode = null; // 'public' | 'private'
+
+document.getElementById('addPublicNoteBtn')?.addEventListener('click', () => openNoteModal('public'));
+document.getElementById('addPrivateNoteBtn')?.addEventListener('click', () => openNoteModal('private'));
+document.getElementById('noteModalCancel')?.addEventListener('click', closeNoteModal);
+document.getElementById('noteModalSubmit')?.addEventListener('click', submitNote);
+
+document.getElementById('noteModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'noteModal') closeNoteModal();
+});
+
+
+function openNoteModal(mode) {
+    if (!currentHeroID) return;
+    noteModalMode = mode;
+    const title = document.getElementById('noteModalTitle');
+    if (title) title.textContent = mode === 'public' ? 'Submit Public Tip' : 'Add Private Note';
+
+    // Reset fields
+    ['noteCounterTips', 'noteTeammateHelp', 'noteGoodComp1', 'noteGoodComp2', 'noteDangerComp1', 'noteDangerComp2']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+
+    populateNoteHeroPicker(currentHeroID);
+
+    selectedSeverity = 1;
+    document.querySelectorAll('.noteSevBtn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.sev) === 1);
+    });
+
+    document.getElementById('noteModal').style.display = 'flex';
+}
+
+let noteSelectedHeroID = null;
+
+function populateNoteHeroPicker(defaultHeroID) {
+    const grid = document.getElementById('noteHeroPicker');
+    if (!grid) return;
+    grid.innerHTML = '';
+    noteSelectedHeroID = defaultHeroID;
+
+    allHeroes.forEach(hero => {
+        const icon = document.createElement('div');
+        icon.className = 'noteHeroPickerIcon';
+        icon.style.backgroundImage = `url(${hero.portrait})`;
+        icon.title = hero.name;
+        if (parseInt(hero.heroID) === parseInt(defaultHeroID)) icon.classList.add('noteHeroActive');
+
+        icon.addEventListener('click', () => {
+            noteSelectedHeroID = parseInt(hero.heroID);
+            grid.querySelectorAll('.noteHeroPickerIcon').forEach(el => el.classList.remove('noteHeroActive'));
+            icon.classList.add('noteHeroActive');
+        });
+
+        grid.appendChild(icon);
+    });
+}
+
+// Severity toggle
+document.querySelectorAll('.noteSevBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        selectedSeverity = parseInt(btn.dataset.sev);
+        document.querySelectorAll('.noteSevBtn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
+
+function closeNoteModal() {
+    const modal = document.getElementById('noteModal');
+    if (modal) modal.style.display = 'none';
+    noteModalMode = null;
+}
+
+async function submitNote() {
+    const counterTips = document.getElementById('noteCounterTips')?.value.trim();
+    const teammateHelp = document.getElementById('noteTeammateHelp')?.value.trim();
+    const goodComps = [document.getElementById('noteGoodComp1')?.value.trim(), document.getElementById('noteGoodComp2')?.value.trim()].filter(Boolean);
+    const dangerousComps = [document.getElementById('noteDangerComp1')?.value.trim(), document.getElementById('noteDangerComp2')?.value.trim()].filter(Boolean);
+
+    if (!counterTips || !currentHeroID) return;
+
+    const btn = document.getElementById('noteModalSubmit');
+    if (btn) btn.textContent = 'Saving…';
+
+    try {
+        const res = await fetch('./save_note.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                heroID: currentHeroID,
+                counteredByHeroID: noteSelectedHeroID || currentHeroID,
+                severity: selectedSeverity,
+                counterTips,
+                teammateHelp,
+                goodComps,
+                dangerousComps,
+                isPublic: noteModalMode === 'public' ? 1 : 0
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            closeNoteModal();
+            fetchMyNotes(currentHeroID);
+        } else {
+            alert(data.error || 'Could not save note.');
+        }
+    } catch (err) {
+        console.error('Note save failed:', err);
+    } finally {
+        if (btn) btn.textContent = 'Save';
+    }
+}
+
+async function fetchMyNotes(heroID) {
+    const list = document.getElementById('myNotesList');
+    if (!list) return;
+    list.innerHTML = '<div class="counterLoading">Loading…</div>';
+
+    try {
+        const res = await fetch(`./get_notes.php?heroID=${heroID}`);
+        const notes = await res.json();
+        renderMyNotes(notes);
+    } catch (err) {
+        console.error('Failed to load notes:', err);
+        list.innerHTML = '<div class="counterLoading">Error loading notes.</div>';
+    }
+}
+
+function renderMyNotes(notes) {
+    const list = document.getElementById('myNotesList');
+    if (!list) return;
+
+    if (!notes || notes.length === 0) {
+        list.innerHTML = '<div class="counterLoading">No notes yet for this hero.</div>';
+        return;
+    }
+
+    list.innerHTML = '';
+    notes.forEach(note => {
+        const severityLabel = ['', 'Soft Counter', 'Hard Counter', 'Extreme Threat'][note.severity] || 'Counter';
+        const severityClass = ['', 'sevSoft', 'sevHard', 'sevExtreme'][note.severity] || 'sevHard';
+        const goodComps = Array.isArray(note.goodComps) ? note.goodComps : JSON.parse(note.goodComps || '[]');
+        const dangerComps = Array.isArray(note.dangerousComps) ? note.dangerousComps : JSON.parse(note.dangerousComps || '[]');
+
+        const card = document.createElement('div');
+        const hero = allHeroes.find(h => parseInt(h.heroID) === parseInt(note.counteredByHeroID)); const portraitUrl = hero ? hero.portrait : '';
+        const heroName = hero ? hero.name : 'Unknown Hero';
+        const heroRole = hero ? hero.role.toUpperCase() : '';
+
+        card.innerHTML = `
+    <div class="counterCardHeader">
+        <div class="counterPortrait" style="background-image: url(${portraitUrl})"></div>
+        <div class="counterMeta">
+            <div class="counterHeroName">${heroName}</div>
+            <div class="counterRole">${heroRole}</div>
+        </div>
+        <div class="severityBadge ${severityClass}">${severityLabel}</div>
+        <div class="counterChevron">▸</div>
+    </div>
+    <div class="counterCardBody">
+        ${note.counterTips ? `
+        <div class="counterSection">
+            <div class="counterSectionTitle">How to counter them</div>
+            <div class="counterSectionText">${note.counterTips}</div>
+        </div>` : ''}
+        ${note.teammateHelp ? `
+        <div class="counterSection">
+            <div class="counterSectionTitle">How teammates can help</div>
+            <div class="counterSectionText">${note.teammateHelp}</div>
+        </div>` : ''}
+        <div class="counterComps">
+            <div class="compBlock compGood">
+                <div class="compTitle">✦ Good Comps With This Hero</div>
+                <div class="compList">${renderComps(goodComps)}</div>
+            </div>
+            <div class="compBlock compDanger">
+                <div class="compTitle">✦ Dangerous Enemy Comps</div>
+                <div class="compList">${renderComps(dangerComps)}</div>
+            </div>
+        </div>
+        <div class="noteCardFooter">
+            <span class="noteCardMeta">${note.isPublic == 1 ? 'Public tip' : 'Private note'} · ${note.createdAt}</span>
+            <button class="noteDeleteBtn" data-noteid="${note.noteID}">✕ Delete</button>
+        </div>
+    </div>
+`;
+
+        const header = card.querySelector('.counterCardHeader');
+        const chevron = card.querySelector('.counterChevron');
+        header.addEventListener('click', () => {
+            const isOpen = card.classList.toggle('counterCardOpen');
+            chevron.textContent = isOpen ? '▾' : '▸';
+        });
+        card.querySelector('.noteDeleteBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteNote(note.noteID);
+        });
+
+        list.appendChild(card);
+    });
+}
+
+let pendingDeleteID = null;
+
+document.getElementById('deleteConfirmCancel')?.addEventListener('click', () => {
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+    pendingDeleteID = null;
+});
+
+document.getElementById('deleteConfirmOk')?.addEventListener('click', async () => {
+    if (!pendingDeleteID) return;
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+    try {
+        const res = await fetch('./delete_note.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ noteID: pendingDeleteID })
+        });
+        const data = await res.json();
+        if (data.success) {
+            closeNoteModal();
+            fetchMyNotes(noteSelectedHeroID || currentHeroID);
+        }
+    } catch (err) {
+        console.error('Delete failed:', err);
+    }
+    pendingDeleteID = null;
+});
+
+function deleteNote(noteID) {
+    pendingDeleteID = noteID;
+    document.getElementById('deleteConfirmModal').style.display = 'flex';
+}
