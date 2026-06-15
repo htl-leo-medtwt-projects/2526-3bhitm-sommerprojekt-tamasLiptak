@@ -139,10 +139,88 @@ async function fetchCounters(heroID) {
         }
 
         renderCounters(counters);
+        fetchPublicNotes(heroID);
     } catch (err) {
         console.error('Failed to load counters:', err);
         if (panel) panel.innerHTML = '<div class="counterLoading">Error loading counters.</div>';
     }
+}
+
+async function fetchPublicNotes(heroID) {
+    try {
+        const res = await fetch(`./get_public_notes.php?heroID=${heroID}`);
+        const notes = await res.json();
+        if (!notes || !notes.length) return;
+        renderPublicNotes(notes);
+    } catch (err) {
+        console.error('Failed to load public notes:', err);
+    }
+}
+
+function renderPublicNotes(notes) {
+    const panel = document.getElementById('counterList');
+    if (!panel) return;
+
+    if (notes.length > 0) {
+        const divider = document.createElement('div');
+        divider.className = 'publicNotesDivider';
+        divider.textContent = 'Community Tips';
+        panel.appendChild(divider);
+    }
+
+    notes.forEach((note, i) => {
+        const severityLabel = ['', 'Soft Counter', 'Hard Counter', 'Extreme Threat'][note.severity] || 'Counter';
+        const severityClass = ['', 'sevSoft', 'sevHard', 'sevExtreme'][note.severity] || 'sevHard';
+        const goodComps   = Array.isArray(note.goodComps)      ? note.goodComps      : JSON.parse(note.goodComps      || '[]');
+        const dangerComps = Array.isArray(note.dangerousComps) ? note.dangerousComps : JSON.parse(note.dangerousComps || '[]');
+
+        const card = document.createElement('div');
+        card.className = 'counterCard publicNoteCard';
+        card.style.animationDelay = `${i * 60}ms`;
+        card.innerHTML = `
+            <div class="counterCardHeader">
+                <div class="counterPortrait" style="background-image: url(${note.counteredByPortrait || ''})"></div>
+                <div class="counterMeta">
+                    <div class="counterHeroName">${note.counteredByName || 'Unknown'}</div>
+                    <div class="counterRole">${(note.counteredByRole || '').toUpperCase()}</div>
+                </div>
+                <div class="publicNoteAuthor">by ${note.username}</div>
+                <div class="severityBadge ${severityClass}">${severityLabel}</div>
+                <div class="counterChevron">▸</div>
+            </div>
+            <div class="counterCardBody">
+                ${note.counterTips ? `
+                <div class="counterSection">
+                    <div class="counterSectionTitle">How to counter them</div>
+                    <div class="counterSectionText">${note.counterTips}</div>
+                </div>` : ''}
+                ${note.teammateHelp ? `
+                <div class="counterSection">
+                    <div class="counterSectionTitle">How teammates can help</div>
+                    <div class="counterSectionText">${note.teammateHelp}</div>
+                </div>` : ''}
+                <div class="counterComps">
+                    <div class="compBlock compGood">
+                        <div class="compTitle">✦ Good Comps With This Hero</div>
+                        <div class="compList">${renderComps(goodComps)}</div>
+                    </div>
+                    <div class="compBlock compDanger">
+                        <div class="compTitle">✦ Dangerous Enemy Comps</div>
+                        <div class="compList">${renderComps(dangerComps)}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const header  = card.querySelector('.counterCardHeader');
+        const chevron = card.querySelector('.counterChevron');
+        header.addEventListener('click', () => {
+            const isOpen = card.classList.toggle('counterCardOpen');
+            chevron.textContent = isOpen ? '▾' : '▸';
+        });
+
+        panel.appendChild(card);
+    });
 }
 
 function renderCounters(counters) {

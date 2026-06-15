@@ -1688,7 +1688,6 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s, color 0.2s, border-color 0.2s;
-    /* remove position:absolute from before */
     position: static;
 }
 
@@ -1696,4 +1695,30 @@ body {
     background: rgba(220, 50, 50, 0.12);
     border-color: rgba(220, 50, 50, 0.6);
     color: #dc3a3a;
+}
+
+.publicNotesDivider {
+    font-family: FuturaDemi;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.25);
+    padding: 16px 4px 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 8px;
+}
+
+.publicNoteCard {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.publicNoteCard:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.publicNoteAuthor {
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.3);
+    margin-right: 8px;
+    flex-shrink: 0;
 }
