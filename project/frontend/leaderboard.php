@@ -25,39 +25,47 @@ while ($row = $result->fetch_assoc()) {
     $playerId = str_replace('#', '-', $row['battletag']);
 
     // --- Summary (rank, endorsement) ---
-    $summaryUrl = "https://overfast-api.tekrop.fr/players/{$playerId}/summary";
+    $summaryUrl  = "https://overfast-api.tekrop.fr/players/{$playerId}/summary";
     $summaryJson = @file_get_contents($summaryUrl);
-    $summary = $summaryJson ? json_decode($summaryJson, true) : null;
+    $summary     = $summaryJson ? json_decode($summaryJson, true) : null;
 
-    // --- Career stats: quickplay hero time ---
-    $statsUrl = "https://overfast-api.tekrop.fr/players/{$playerId}/stats/career?gamemode=quickplay";
+    // --- Career stats ---
+    $statsUrl  = "https://overfast-api.tekrop.fr/players/{$playerId}/stats/career?gamemode=quickplay";
     $statsJson = @file_get_contents($statsUrl);
-    $stats = $statsJson ? json_decode($statsJson, true) : null;
+    $stats     = $statsJson ? json_decode($statsJson, true) : null;
 
-    // Find most-played hero by time_played_video_game
+    // Parse heroes: $stats is keyed directly by hero name at top level
     $mostPlayedHero = null;
-    $maxTime = 0;
+    $maxTime        = 0;
+    $allHeroStats   = null;
+    $heroName       = null;
+    $heroPortrait   = null;
 
-    if ($stats && isset($stats['heroes'])) {
-        foreach ($stats['heroes'] as $heroData) {
-            // Skip 'all-heroes' aggregate
-            if (!isset($heroData['hero']) || $heroData['hero'] === 'all-heroes') continue;
+    if ($stats) {
+        $allHeroStats = $stats['all-heroes'] ?? null;
 
-            $timePlayed = 0;
-            // Navigate: heroData -> stats -> game -> time_played_video_game (seconds)
-            if (isset($heroData['stats']['game']['time_played_video_game'])) {
-                $timePlayed = $heroData['stats']['game']['time_played_video_game'];
-            }
+        foreach ($stats as $heroKey => $heroData) {
+            if ($heroKey === 'all-heroes') continue;
+            $timePlayed = $heroData['game']['time_played'] ?? 0;
             if ($timePlayed > $maxTime) {
-                $maxTime = $timePlayed;
-                $mostPlayedHero = $heroData['hero'];
+                $maxTime        = $timePlayed;
+                $mostPlayedHero = $heroKey;
             }
         }
     }
 
+    // Fetch hero portrait + display name
+    if ($mostPlayedHero) {
+        $heroUrl    = "https://overfast-api.tekrop.fr/heroes/{$mostPlayedHero}";
+        $heroJson   = @file_get_contents($heroUrl);
+        $heroDetail = $heroJson ? json_decode($heroJson, true) : null;
+        $heroPortrait = $heroDetail['portrait'] ?? null;
+        $heroName     = $heroDetail['name']     ?? ucfirst($mostPlayedHero);
+    }
+
     // Build competitive rank: find the highest division across roles
-    $competitive = $summary['competitive']['pc'] ?? null;
-    $rankInfo = null;
+    $competitive   = $summary['competitive']['pc'] ?? null;
+    $rankInfo      = null;
     $divisionOrder = ['Grandmaster', 'Master', 'Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'];
 
     if ($competitive) {
@@ -66,8 +74,8 @@ while ($row = $result->fetch_assoc()) {
             foreach ($roles as $role) {
                 if (isset($competitive[$role]) && $competitive[$role] !== null) {
                     $tier = $competitive[$role]['division'] ?? '';
-                    if (stripos($tier, $division) !== false || $tier === $division) {
-                        $rankInfo = $competitive[$role];
+                    if (stripos($tier, $division) !== false) {
+                        $rankInfo         = $competitive[$role];
                         $rankInfo['role'] = $role;
                         break 2;
                     }
@@ -78,7 +86,7 @@ while ($row = $result->fetch_assoc()) {
         if (!$rankInfo) {
             foreach ($roles as $role) {
                 if (isset($competitive[$role]) && $competitive[$role] !== null) {
-                    $rankInfo = $competitive[$role];
+                    $rankInfo         = $competitive[$role];
                     $rankInfo['role'] = $role;
                     break;
                 }
@@ -86,41 +94,17 @@ while ($row = $result->fetch_assoc()) {
         }
     }
 
-    // Endorsement
-    $endorsement = $summary['endorsement'] ?? null;
-
-    // Hero portrait from OverFast heroes endpoint (we cache key->portrait mapping via inline call)
-    $heroPortrait = null;
-    if ($mostPlayedHero) {
-        $heroUrl = "https://overfast-api.tekrop.fr/heroes/{$mostPlayedHero}";
-        $heroJson = @file_get_contents($heroUrl);
-        $heroDetail = $heroJson ? json_decode($heroJson, true) : null;
-        $heroPortrait = $heroDetail['portrait'] ?? null;
-        $heroName = $heroDetail['name'] ?? ucfirst($mostPlayedHero);
-    }
-
-    // Build all-hero stats for tooltip (eliminations, deaths, wins etc from all-heroes)
-    $allHeroStats = null;
-    if ($stats && isset($stats['heroes'])) {
-        foreach ($stats['heroes'] as $heroData) {
-            if (($heroData['hero'] ?? '') === 'all-heroes') {
-                $allHeroStats = $heroData['stats'] ?? null;
-                break;
-            }
-        }
-    }
-
     $players[] = [
-        'username'        => $row['username'],
-        'battletag'       => $row['battletag'],
-        'endorsement'     => $endorsement,
-        'rank'            => $rankInfo,
-        'mostPlayedHero'  => $mostPlayedHero ?? null,
-        'heroName'        => $heroName ?? null,
-        'heroPortrait'    => $heroPortrait,
-        'heroTimeSecs'    => $maxTime,
-        'allStats'        => $allHeroStats,
-        'profilePrivate'  => ($summary === null),
+        'username'       => $row['username'],
+        'battletag'      => $row['battletag'],
+        'endorsement'    => $summary['endorsement'] ?? null,
+        'rank'           => $rankInfo,
+        'mostPlayedHero' => $mostPlayedHero,
+        'heroName'       => $heroName,
+        'heroPortrait'   => $heroPortrait,
+        'heroTimeSecs'   => $maxTime,
+        'allStats'       => $allHeroStats,
+        'profilePrivate' => ($summary === null),
     ];
 }
 

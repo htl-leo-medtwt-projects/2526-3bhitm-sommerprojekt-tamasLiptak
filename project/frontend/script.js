@@ -11,20 +11,20 @@ function getRankColor(division) {
     if (!division) return '#aaa';
     const d = division.toLowerCase();
     if (d.includes('grandmaster')) return '#ff8c00';
-    if (d.includes('master'))      return '#da70d6';
-    if (d.includes('diamond'))     return '#00d2ff';
-    if (d.includes('platinum'))    return '#4dd9ac';
-    if (d.includes('gold'))        return '#ffd700';
-    if (d.includes('silver'))      return '#c0c0c0';
-    if (d.includes('bronze'))      return '#cd7f32';
+    if (d.includes('master')) return '#da70d6';
+    if (d.includes('diamond')) return '#00d2ff';
+    if (d.includes('platinum')) return '#4dd9ac';
+    if (d.includes('gold')) return '#ffd700';
+    if (d.includes('silver')) return '#c0c0c0';
+    if (d.includes('bronze')) return '#cd7f32';
     return '#aaa';
 }
 
 function buildRankBadge(rank) {
     if (!rank) return '<span style="color:#555;font-family:FuturaDemi,sans-serif;font-size:0.65rem;text-transform:uppercase;">Unranked</span>';
     const division = rank.division || '';
-    const tier     = rank.tier !== undefined ? rank.tier : '';
-    const color    = getRankColor(division);
+    const tier = rank.tier !== undefined ? rank.tier : '';
+    const color = getRankColor(division);
     const tierIcon = rank.tier_icon || rank.tierIcon || '';
 
     let html = `<span style="color:${color};font-family:BigNoodleTooOblique,sans-serif;font-size:1rem;text-transform:uppercase;line-height:1;">`;
@@ -53,29 +53,30 @@ function createTooltip(player) {
     const tip = document.createElement('div');
     tip.className = 'leaderboard-tooltip';
 
-    const stats     = player.allStats || {};
-    const combat    = stats.combat || {};
-    const game      = stats.game || {};
-    const best      = stats.best || {};
-    const average   = stats.average || {};
+    const stats = player.allStats || {};
+    const combat = stats.combat || {};
+    const game = stats.game || {};
+    const best = stats.best || {};
+    const average = stats.average || {};
 
-    const elims     = combat.eliminations ?? '—';
-    const deaths    = combat.deaths       ?? game.deaths ?? '—';
-    const finalBlows= combat.final_blows  ?? '—';
-    const gamesWon  = game.games_won      ?? '—';
+    const elims = combat.eliminations ?? '—';
+    const deaths = combat.deaths ?? game.deaths ?? '—';
+    const finalBlows = combat.final_blows ?? '—';
+    const gamesWon = game.games_won ?? '—';
     const gamesPlayed = game.games_played ?? '—';
-    const winRate   = (gamesWon !== '—' && gamesPlayed && gamesPlayed > 0)
+    const winRate = (gamesWon !== '—' && gamesPlayed && gamesPlayed > 0)
         ? Math.round((gamesWon / gamesPlayed) * 100) + '%'
         : '—';
-    const kd        = (elims !== '—' && deaths !== '—' && deaths > 0)
+    const kd = (elims !== '—' && deaths !== '—' && deaths > 0)
         ? (elims / deaths).toFixed(2)
         : '—';
-    const bestKS    = best.kill_streak_best ?? '—';
-    const dmg       = combat.hero_damage_done
+    const bestKS = best.kill_streak_best ?? '—';
+    const dmg = combat.hero_damage_done
         ? (combat.hero_damage_done / 1000).toFixed(1) + 'k'
         : '—';
-    const healing   = combat.healing_done
-        ? (combat.healing_done / 1000).toFixed(1) + 'k'
+    const assists = stats.assists || {};
+    const healing = assists.healing_done
+        ? (assists.healing_done / 1000).toFixed(1) + 'k'
         : '—';
     const timeHours = secsToHours(player.heroTimeSecs);
 
@@ -138,13 +139,13 @@ function createTooltip(player) {
 function positionTooltip(tip, anchor) {
     document.body.appendChild(tip);
     const rect = anchor.getBoundingClientRect();
-    const tipW  = tip.offsetWidth;
-    const tipH  = tip.offsetHeight;
+    const tipW = tip.offsetWidth;
+    const tipH = tip.offsetHeight;
     const scrollY = window.scrollY;
     const viewW = window.innerWidth;
 
     let left = rect.right + 12;
-    let top  = rect.top + scrollY + (rect.height / 2) - (tipH / 2);
+    let top = rect.top + scrollY + (rect.height / 2) - (tipH / 2);
 
     // Flip to left if overflows right
     if (left + tipW > viewW - 12) {
@@ -154,7 +155,7 @@ function positionTooltip(tip, anchor) {
     if (top < scrollY + 8) top = scrollY + 8;
 
     tip.style.left = left + 'px';
-    tip.style.top  = top  + 'px';
+    tip.style.top = top + 'px';
 }
 
 // ─── Tooltip Styles ─────────────────────────────────────────────────────────
@@ -177,7 +178,6 @@ function injectTooltipStyles() {
             opacity: 0;
             transform: translateX(-10px);
             transition: opacity 0.15s ease, transform 0.15s ease;
-            clip-path: polygon(0% 0%, 100% 0%, 97% 100%, 0% 100%);
             color: white;
         }
         .leaderboard-tooltip.tip-visible {
@@ -407,7 +407,7 @@ async function loadLeaderboard() {
     injectTooltipStyles();
 
     try {
-        const res     = await fetch('./leaderboard.php');
+        const res = await fetch('./leaderboard.php');
         const players = await res.json();
 
         container.innerHTML = '';
@@ -428,7 +428,7 @@ async function loadLeaderboard() {
 
             // Division label
             const division = player.rank?.division ?? null;
-            const tier     = player.rank?.tier !== undefined ? ` ${player.rank.tier}` : '';
+            const tier = player.rank?.tier !== undefined ? ` ${player.rank.tier}` : '';
             const rankLabel = division ? `${division}${tier}` : 'Unranked';
             const rankColor = getRankColor(division);
 
