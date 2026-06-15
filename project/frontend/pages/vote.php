@@ -16,7 +16,7 @@ if (!$userID) {
 $type  = $_POST['type']  ?? '';
 $value = $_POST['value'] ?? '';
 
-if (!in_array($type, ['hero', 'map']) || empty($value)) {
+if (!in_array($type, ['hero', 'map', 'skin']) || empty($value)) {
     echo json_encode(['success' => false, 'error' => 'invalid_input']);
     exit;
 }

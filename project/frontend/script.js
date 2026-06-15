@@ -253,63 +253,67 @@ const VOTE_API = './pages/vote.php';
 const HEROES_API = './pages/get_heroes.php';
 const MAPS_API = './pages/get_maps.php';
 const VOTES_API = './pages/get_votes.php';
+const SKINS_API = './pages/get_skins.php';
 
 let allHeroes = [];
 let allMaps = [];
-let userVotes = { hero: null, map: null };
+let skinStructure = {};
+let userVotes = { hero: null, map: null, skin: null };
 let isLoggedIn = false;
 let overlayTimeout = null;
 
 async function initFavourites() {
-    const [heroesRes, mapsRes, votesRes] = await Promise.all([
+    const [heroesRes, mapsRes, votesRes, skinStructRes] = await Promise.all([
         fetch(HEROES_API),
         fetch(MAPS_API),
         fetch(VOTES_API),
+        fetch(SKINS_API + '?mode=structure'),
     ]);
 
     allHeroes = await heroesRes.json();
     allMaps = await mapsRes.json();
+    skinStructure = await skinStructRes.json();
     const votes = await votesRes.json();
 
-    userVotes = votes.user_votes || { hero: null, map: null };
+    userVotes = votes.user_votes || { hero: null, map: null, skin: null };
     isLoggedIn = votes.logged_in || false;
 
-    // Render winners first, then attach hover — order matters
     renderTopItem('map', votes.top_map);
     renderTopItem('hero', votes.top_hero);
+    renderTopItem('skin', votes.top_skin);
     attachHoverListeners();
 }
 
 // ── Render the winning item into the grid box ────────────────────────────────
 function renderTopItem(type, data) {
-    const index = type === 'map' ? 0 : 1;
+    const index = type === 'map' ? 0 : type === 'hero' ? 1 : 2;
     const box = document.querySelectorAll('.gridItem')[index];
     if (!box) return;
 
     if (data) {
-        box.style.backgroundImage = `url(${data.screenshot})`;
+        box.style.backgroundImage = `url(${data.image_url || data.screenshot})`;
         box.style.backgroundSize = 'cover';
-        box.style.backgroundPosition = type === 'hero' ? '80% center' : 'center';
+        box.style.backgroundPosition = type === 'hero' ? '80% center' : type === 'skin' ? 'left 40%' : 'center'; const subLabel = type === 'skin' && data.hero_name
+            ? `<span class="gridItem-sub">${data.hero_name}</span>` : '';
         box.innerHTML = `
             <div class="gridItem-label">
                 <span class="gridItem-name">${data.name}</span>
+                ${subLabel}
                 <span class="gridItem-votes">${data.votes} vote${data.votes == 1 ? '' : 's'}</span>
             </div>`;
     } else {
         box.style.backgroundImage = '';
-        box.innerHTML = `<span class="gridItem-name">${type === 'map' ? 'Map' : 'Hero'}</span>`;
+        box.innerHTML = `<span class="gridItem-name">${type.charAt(0).toUpperCase() + type.slice(1)}</span>`;
     }
     box.dataset.voteType = type;
 }
 
-// ── Hover listeners on Map + Hero boxes ─────────────────────────────────────
+// ── Hover listeners ──────────────────────────────────────────────────────────
 function attachHoverListeners() {
     const gridItems = document.querySelectorAll('.gridItem');
-    const mapBox = gridItems[0];
-    const heroBox = gridItems[1];
-
-    if (mapBox) setupHover(mapBox, 'map');
-    if (heroBox) setupHover(heroBox, 'hero');
+    if (gridItems[0]) setupHover(gridItems[0], 'map');
+    if (gridItems[1]) setupHover(gridItems[1], 'hero');
+    if (gridItems[2]) setupHover(gridItems[2], 'skin');
 }
 
 function setupHover(box, type) {
@@ -324,7 +328,7 @@ function setupHover(box, type) {
     });
 }
 
-// ── Build & show the overlay grid ───────────────────────────────────────────
+// ── Build & show the overlay ─────────────────────────────────────────────────
 function showOverlay(anchor, type) {
     closeOverlay(true);
 
@@ -341,13 +345,14 @@ function showOverlay(anchor, type) {
         overlay.innerHTML = `<p class="vote-login-notice">Log in to vote for this week's favourites.</p>`;
     } else if (type === 'hero') {
         overlay.appendChild(buildHeroGrid());
-    } else {
+    } else if (type === 'map') {
         overlay.appendChild(buildMapGrid());
+    } else {
+        overlay.appendChild(buildSkinTree());
     }
 
     document.body.appendChild(overlay);
 
-    // Position above the anchor box
     const rect = anchor.getBoundingClientRect();
     overlay.style.position = 'fixed';
     overlay.style.left = `${Math.max(0, rect.right - 520)}px`;
@@ -359,17 +364,15 @@ function showOverlay(anchor, type) {
 function closeOverlay(immediate = false) {
     const overlay = document.getElementById('vote-overlay');
     if (!overlay) return;
-    if (immediate) {
-        overlay.remove();
-        return;
-    }
+    if (immediate) { overlay.remove(); return; }
     overlay.classList.remove('vote-overlay--visible');
     overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
 }
 
 // ── Hero grid grouped by role ────────────────────────────────────────────────
 function buildHeroGrid() {
-    const roles = ['tank', 'damage', 'support']; const frag = document.createDocumentFragment();
+    const roles = ['tank', 'damage', 'support'];
+    const frag = document.createDocumentFragment();
 
     roles.forEach(role => {
         const group = allHeroes.filter(h => h.role === role);
@@ -377,7 +380,12 @@ function buildHeroGrid() {
 
         const section = document.createElement('div');
         section.className = 'vote-role-section';
-        section.innerHTML = `<h4 class="vote-role-title">${role.charAt(0).toUpperCase() + role.slice(1)}</h4>`;
+
+        const title = document.createElement('h4');
+        title.className = 'vote-role-title vote-group-toggle';
+        title.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+        title.dataset.open = 'true';
+
         const grid = document.createElement('div');
         grid.className = 'vote-grid';
 
@@ -391,6 +399,8 @@ function buildHeroGrid() {
             grid.appendChild(card);
         });
 
+        title.addEventListener('click', () => toggleGroup(title, grid));
+        section.appendChild(title);
         section.appendChild(grid);
         frag.appendChild(section);
     });
@@ -418,6 +428,219 @@ function buildMapGrid() {
     return frag;
 }
 
+
+// ── Skin tree: role → hero → source → rarity → lazy-loaded cards ─────────────
+function buildSkinTree() {
+    const roles = ['tank', 'damage', 'support'];
+    const frag = document.createDocumentFragment();
+
+    roles.forEach(role => {
+        const heroes = allHeroes.filter(h => h.role === role);
+        if (!heroes.length) return;
+
+        const roleSection = document.createElement('div');
+        roleSection.className = 'vote-role-section';
+
+        const roleTitle = document.createElement('h4');
+        roleTitle.className = 'vote-role-title vote-group-toggle';
+        roleTitle.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+        roleTitle.dataset.open = 'false';
+
+        const heroContainer = document.createElement('div');
+        heroContainer.className = 'vote-rarity-container vote-group-hidden';
+
+        heroes.forEach(hero => {
+            const heroSection = document.createElement('div');
+            heroSection.className = 'vote-rarity-section';
+
+            const heroTitle = document.createElement('h5');
+            heroTitle.className = 'vote-rarity-title vote-group-toggle';
+            heroTitle.dataset.open = 'false';
+            heroTitle.dataset.loaded = 'false';
+            heroTitle.dataset.hero = hero.name;
+            heroTitle.innerHTML = `
+                <img src="${hero.portrait}" alt="${hero.name}" class="vote-hero-thumb">
+                ${hero.name}`;
+
+            const sourceContainer = document.createElement('div');
+            sourceContainer.className = 'vote-rarity-container vote-group-hidden';
+
+            heroTitle.addEventListener('click', () => {
+                if (heroTitle.dataset.loaded === 'false') {
+                    loadHeroSkinStructure(hero.name, sourceContainer, heroTitle);
+                } else {
+                    toggleGroup(heroTitle, sourceContainer);
+                }
+            });
+
+            heroSection.appendChild(heroTitle);
+            heroSection.appendChild(sourceContainer);
+            heroContainer.appendChild(heroSection);
+        });
+
+        roleTitle.addEventListener('click', () => toggleGroup(roleTitle, heroContainer));
+        roleSection.appendChild(roleTitle);
+        roleSection.appendChild(heroContainer);
+        frag.appendChild(roleSection);
+    });
+
+    return frag;
+}
+
+// ── Load sources for a hero ───────────────────────────────────────────────────
+async function loadHeroSkinStructure(heroName, container, toggle) {
+    container.innerHTML = `<p class="vote-loading">Loading...</p>`;
+    toggleGroup(toggle, container);
+    toggle.dataset.loaded = 'true';
+
+    try {
+        const params = new URLSearchParams({ mode: 'structure', hero: heroName });
+        const res = await fetch(`${SKINS_API}?${params}`);
+        const structure = await res.json();
+
+        container.innerHTML = '';
+
+        Object.entries(structure).forEach(([source, rarities]) => {
+            const sourceSection = document.createElement('div');
+            sourceSection.className = 'vote-rarity-section';
+
+            const sourceTitle = document.createElement('h5');
+            sourceTitle.className = 'vote-rarity-title vote-group-toggle';
+            sourceTitle.textContent = source;
+            sourceTitle.dataset.open = 'false';
+
+            const rarityContainer = document.createElement('div');
+            rarityContainer.className = 'vote-rarity-container vote-group-hidden';
+
+            Object.entries(rarities).forEach(([rarity, count]) => {
+                const raritySection = document.createElement('div');
+                raritySection.className = 'vote-rarity-section';
+
+                const rarityTitle = document.createElement('h5');
+                rarityTitle.className = 'vote-rarity-title vote-group-toggle';
+                rarityTitle.textContent = `${rarity} (${count})`;
+                rarityTitle.dataset.open = 'false';
+                rarityTitle.dataset.loaded = 'false';
+
+                const skinGrid = document.createElement('div');
+                skinGrid.className = 'vote-grid vote-group-hidden';
+
+                rarityTitle.addEventListener('click', () => {
+                    if (rarityTitle.dataset.loaded === 'false') {
+                        loadSkins(heroName, source, rarity, skinGrid, rarityTitle);
+                    } else {
+                        toggleGroup(rarityTitle, skinGrid);
+                    }
+                });
+
+                raritySection.appendChild(rarityTitle);
+                raritySection.appendChild(skinGrid);
+                rarityContainer.appendChild(raritySection);
+            });
+
+            sourceTitle.addEventListener('click', () => toggleGroup(sourceTitle, rarityContainer));
+            sourceSection.appendChild(sourceTitle);
+            sourceSection.appendChild(rarityContainer);
+            container.appendChild(sourceSection);
+        });
+
+    } catch (err) {
+        container.innerHTML = `<p class="vote-loading">Failed to load.</p>`;
+    }
+}
+
+// ── Lazy load skins for a hero + source + rarity ─────────────────────────────
+async function loadSkins(heroName, source, rarity, grid, toggle) {
+    grid.innerHTML = `<p class="vote-loading">Loading...</p>`;
+    toggleGroup(toggle, grid);
+    toggle.dataset.loaded = 'true';
+
+    try {
+        const params = new URLSearchParams({ mode: 'skins', hero: heroName, source, rarity });
+        const res = await fetch(`${SKINS_API}?${params}`);
+        const skins = await res.json();
+
+        grid.innerHTML = '';
+
+        skins.forEach(skin => {
+            const card = document.createElement('div');
+            card.className = 'vote-card vote-card--map' + (userVotes.skin === skin.name ? ' vote-card--active' : '');
+            card.innerHTML = `
+                <img src="${skin.image_url}" alt="${skin.name}" class="vote-card-img vote-card-img--map">
+                <span class="vote-card-name">${skin.name}</span>`;
+            card.addEventListener('click', () => castVote('skin', `${heroName}|${skin.name}`, card));
+            attachSkinPreview(card, skin, heroName);
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        grid.innerHTML = `<p class="vote-loading">Failed to load.</p>`;
+    }
+}
+
+// ── Skin preview tooltip ─────────────────────────────────────────────────────
+
+const RARITY_COLORS = {
+    Mythic: '#ff9c00',
+    Legendary: '#ff6a00',
+    Epic: '#9b4dca',
+    Rare: '#0070dd',
+    Common: '#9d9d9d',
+    Unknown: '#555555',
+};
+
+function attachSkinPreview(card, skin, heroName) {
+    card.addEventListener('mouseenter', (e) => showSkinPreview(e, skin, heroName));
+    card.addEventListener('mouseleave', hideSkinPreview);
+}
+
+function showSkinPreview(e, skin, heroName) {
+    hideSkinPreview();
+
+    const preview = document.createElement('div');
+    preview.id = 'skin-preview';
+    preview.className = 'skin-preview';
+
+    const rarityColor = RARITY_COLORS[skin.rarity] || RARITY_COLORS.Unknown;
+
+    preview.innerHTML = `
+        <img src="${skin.image_url}" alt="${skin.name}" class="skin-preview-img">
+        <div class="skin-preview-info" style="border-top: 2px solid ${rarityColor}">
+            <span class="skin-preview-name">${skin.name}</span>
+            <span class="skin-preview-hero">${heroName}</span>
+            <div class="skin-preview-meta">
+                <span class="skin-preview-rarity" style="color: ${rarityColor}">${skin.rarity}</span>
+                <span class="skin-preview-cost">${skin.cost}</span>
+            </div>
+        </div>`;
+
+    document.body.appendChild(preview);
+
+    // Position to the right of the card, or left if no space
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pw = 220;
+    const left = rect.right + 8 + pw > window.innerWidth
+        ? rect.left - pw - 8
+        : rect.right + 8;
+
+    preview.style.position = 'fixed';
+    preview.style.left = `${left}px`;
+    preview.style.top = `${Math.min(rect.top, window.innerHeight - preview.offsetHeight - 10)}px`;
+
+    requestAnimationFrame(() => preview.classList.add('skin-preview--visible'));
+}
+
+function hideSkinPreview() {
+    const existing = document.getElementById('skin-preview');
+    if (existing) existing.remove();
+}
+
+// ── Toggle a collapsible group ───────────────────────────────────────────────
+function toggleGroup(toggle, content) {
+    const isOpen = toggle.dataset.open === 'true';
+    toggle.dataset.open = isOpen ? 'false' : 'true';
+    content.classList.toggle('vote-group-hidden', isOpen);
+}
+
 // ── Cast a vote ──────────────────────────────────────────────────────────────
 async function castVote(type, value, clickedCard) {
     const overlay = document.getElementById('vote-overlay');
@@ -437,11 +660,13 @@ async function castVote(type, value, clickedCard) {
             const votesData = await votesRes.json();
             renderTopItem('map', votesData.top_map);
             renderTopItem('hero', votesData.top_hero);
+            renderTopItem('skin', votesData.top_skin);
         }
     } catch (err) {
         console.error('Vote failed:', err);
     }
 }
+
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initFavourites);
