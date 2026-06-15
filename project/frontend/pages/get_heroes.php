@@ -12,7 +12,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-$query = "SELECT heroID, name, role, portrait, description, abilities, screenshot FROM heroes ORDER BY name ASC";
+$query = "SELECT heroID, name, role, portrait, description, abilities, screenshot, best_maps FROM heroes ORDER BY name ASC";
 $result = $conn->query($query);
 
 $heroes = [];
@@ -21,6 +21,8 @@ if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $abilitiesArray = !empty($row['abilities']) ? json_decode($row['abilities'], true) : [];
         
+        $bestMapsArray = !empty($row['best_maps']) ? json_decode($row['best_maps'], true) : [];
+
         $heroes[] = [
             "heroID" => $row['heroID'],
             "name" => $row['name'],
@@ -28,7 +30,8 @@ if ($result && $result->num_rows > 0) {
             "portrait" => $row['portrait'],
             "description" => $row['description'],
             "abilities" => $abilitiesArray,
-            "screenshot" => $row['screenshot'] 
+            "screenshot" => $row['screenshot'],
+            "best_maps" => $bestMapsArray
         ];
     }
 }

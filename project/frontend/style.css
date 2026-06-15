@@ -1245,12 +1245,23 @@ body {
     width: 120px;
     height: 70px;
     background: #00d2ff;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+.mapBox:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
 }
 
-.emptyBox {
-    width: 120px;
-    height: 70px;
+.topMapsLabel {
+    font-family: Pulse;
+    font-size: 0.8rem;
+    color: #00d2ff;
 }
 
 /* maps.php */

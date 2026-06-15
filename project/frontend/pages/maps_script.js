@@ -7,11 +7,25 @@ async function fetchMaps() {
         allMaps = await response.json();
         const gamemodes = [...new Set(allMaps.flatMap(m => m.gamemodes))].sort();
         renderGamemodeList(gamemodes);
-        selectGamemode(gamemodes[0]);
+
+        const params = new URLSearchParams(window.location.search);
+        const savedMap = params.get('map');
+        if (savedMap) {
+            const target = allMaps.find(m => m.name.toLowerCase() === savedMap.toLowerCase());
+            if (target) {
+                selectGamemode(target.gamemodes[0], target);
+            } else {
+                selectGamemode(gamemodes[0]);
+            }
+        } else {
+            selectGamemode(gamemodes[0]);
+        }
     } catch (error) {
         console.error('Failed to load maps from database:', error);
     }
 }
+
+fetchMaps();
 
 function renderGamemodeList(gamemodes) {
     const container = document.getElementById('gamemodeList');
@@ -26,14 +40,18 @@ function renderGamemodeList(gamemodes) {
     });
 }
 
-function selectGamemode(gm) {
+function selectGamemode(gm, overrideMap = null) {
     selectedGamemode = gm;
     document.querySelectorAll('.gamemodeBtn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.gm === gm);
     });
     const filtered = allMaps.filter(m => m.gamemodes.includes(gm));
     renderMapGrid(filtered);
-    if (filtered.length > 0) loadMapDetails(filtered[0]);
+    if (overrideMap) {
+        loadMapDetails(overrideMap);
+    } else if (filtered.length > 0) {
+        loadMapDetails(filtered[0]);
+    }
 }
 
 function renderMapGrid(maps) {
@@ -60,8 +78,6 @@ function loadMapDetails(map) {
     document.getElementById('mapLocation').textContent = map.location || '';
     document.getElementById('mapModes').textContent = map.gamemodes.map(g => g.charAt(0).toUpperCase() + g.slice(1)).join(', ');
 }
-
-fetchMaps();
 
 var currentPath = window.location.pathname;
 

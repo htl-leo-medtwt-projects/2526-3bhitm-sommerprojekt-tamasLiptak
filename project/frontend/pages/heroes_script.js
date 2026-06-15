@@ -1,14 +1,24 @@
 let allHeroes = [];
+let allMaps = [];
+
+async function fetchMapsForHeroes() {
+    try {
+        const response = await fetch('./get_maps.php');
+        allMaps = await response.json();
+    } catch (error) {
+        console.error("Failed to load maps for hero page:", error);
+    }
+}
 
 async function fetchHeroes() {
     try {
         const response = await fetch('./get_heroes.php');
         allHeroes = await response.json();
-        
+
         renderHeroList(allHeroes);
-        
+
         if (allHeroes.length > 0) {
-            loadHeroDetails(allHeroes[0].heroID);
+            setTimeout(() => loadHeroDetails(allHeroes[0].heroID), 0);
         }
     } catch (error) {
         console.error("Failed to load heroes from database:", error);
@@ -25,7 +35,7 @@ function renderHeroList(heroes) {
 
     roles.forEach(role => {
         const roleHeroes = heroes.filter(h => h.role.toLowerCase() === role);
-        
+
         const roleWrapper = document.createElement('div');
         roleWrapper.className = 'roleSection';
         roleWrapper.innerHTML = `<h3>${role.toUpperCase()}</h3>`;
@@ -38,7 +48,7 @@ function renderHeroList(heroes) {
             div.className = 'heroPortrait';
             div.style.backgroundImage = `url(${hero.portrait})`;
             div.title = hero.name;
-            
+
             div.onclick = () => loadHeroDetails(hero.heroID);
             grid.appendChild(div);
         });
@@ -60,6 +70,43 @@ function loadHeroDetails(heroID) {
         bigImg.src = hero.screenshot ? hero.screenshot : hero.portrait;
     }
 
+    const mapSuggestions = document.querySelector('.mapSuggestions');
+    mapSuggestions.innerHTML = '';
+
+    const mapsToShow = (hero.best_maps && hero.best_maps.length > 0)
+        ? hero.best_maps.slice(0, 3)
+        : [];
+
+    if (mapsToShow.length > 0) {
+        const matchedMaps = mapsToShow.map(mapName =>
+            allMaps.find(m => m.name.toLowerCase() === mapName.toLowerCase())
+        ).filter(Boolean);
+
+        matchedMaps.forEach(map => {
+            const box = document.createElement('div');
+            box.className = 'mapBox';
+            box.style.backgroundImage = `url(${map.screenshot})`;
+            box.title = map.name;
+            box.onclick = () => {
+                window.location.href = `./maps.php?map=${encodeURIComponent(map.name)}`;
+            };
+            mapSuggestions.appendChild(box);
+        });
+
+        const remaining = 3 - matchedMaps.length;
+        for (let i = 0; i < remaining; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'emptyBox';
+            mapSuggestions.appendChild(empty);
+        }
+    } else {
+        for (let i = 0; i < 3; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'emptyBox';
+            mapSuggestions.appendChild(empty);
+        }
+    }
+
     const abilityContainer = document.getElementById('abilityContainer');
     abilityContainer.innerHTML = '';
 
@@ -74,7 +121,7 @@ function loadHeroDetails(heroID) {
     }
 }
 
-fetchHeroes();
+fetchMapsForHeroes().then(() => fetchHeroes());
 
 var currentPath = window.location.pathname;
 var navLinks = document.querySelectorAll('.navItem');

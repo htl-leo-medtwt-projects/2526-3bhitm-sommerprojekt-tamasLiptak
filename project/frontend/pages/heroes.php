@@ -69,12 +69,9 @@ $navPfp = ($loggedIn && !empty($userData['profilepicture']))
                 <h1 id="selectedHeroName" class="heroNameLarge">Select Hero</h1>
                 <p id="selectedHeroDesc" class="heroDesc">Click a hero portrait to view details.</p>
 
-                <div class="mapSuggestions">
-                    <div class="mapBox"></div>
-                    <div class="mapBox"></div>
-                    <div class="mapBox"></div>
-                </div><br>
-                <span style="font-family: Pulse; font-size: 0.8rem; color: #00d2ff;">← Top 3 Maps</span>
+                <div class="mapSuggestions"></div>
+                <br>
+                <span class="topMapsLabel">Top Maps</span>
             </div>
         </div>
     </div>
